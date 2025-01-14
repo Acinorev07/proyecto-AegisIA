@@ -1,0 +1,441 @@
+{
+    "Proyecto aegisIA": {
+      "version":"0.0.1",
+      "Estructura de Directorios": {
+        "raiz": {
+          "archivos": {
+                "analyze_and_execute_strategy.py": {
+                  "declara": {
+                    "funciones": ["analyze_and_execute_strategy"],
+                    "clases": {},
+                    "Blueprints":[],
+                    "Decoradores":[],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"ejecutable":["fetch_historical_data"], "origen":"market_data.py","tipo":"funcion"},
+                    {"ejecutable":["evaluate_strategy_performance"],"origen":"trading_logic.py","tipo":"funcion"}
+                  ]
+                },
+                "app_init.py": {
+                  "declara": {
+                    "funciones": ["analyze_and_execute_strategy"],
+                    "clases": {},
+                    "Blueprints":[
+                      {"nombre":"analyze_and_execute_strategy_bp","ruta":"analyze_and_execute_strategy"}
+                    ],
+                    "Decoradores":[],
+                    "instancias":[
+                      {"nombre":"logger","tipo":"logging"}
+                    ]
+                  },
+                  "utiliza": [
+                    {"ejecutable": ["evaluate_strategy_performance"], "origen": "trading_logic.py","tipo":"funcion"},
+                    {"ejecutable": ["fetch_historical_data"], "origen": "market_data.py","tipo":"funcion"},
+                    {"ejecutable":["routes"],"origen":"routes.py","tipo":"Blueprints"}
+                  ]
+                },
+                "execute_trade.py": {
+                  "declara": {
+                    "funciones": ["execute_trade"],
+                    "clases": {},
+                    "Blueprints":["execute_trade_bp"],
+                    "Decoradores":["@execute_trade_bp.route"],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"ejecutable":["execute_kraken_trade"],"origen":"market_data","tipo":"funcion"}
+                  ]
+                },
+                "kraken_api.py": {
+                  "declara": {
+                    "funciones": ["execute_trade"],
+                    "clases": {
+                        "KrakenFuturesAPI": ["__init__", "get_balance", "place_order"] 
+                    },
+                    "Blueprints":["execute_trade_bp"],
+                    "Decoradores":["@execute_trade_bp.route"],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"ejecutable": ["get_account_balance","executable_kraken_trade"], "origen": "market_data.py"}
+                  ]
+                },
+                "main.py": {
+                  "declara": {
+                    "funciones": ["initialize_server","test"],
+                    "clases": [],
+                    "Blueprints":[],
+                    "Decoradores":[
+                      {"nombre":"@app.route","ruta":"test"}
+                    ],
+                    "instancias":[
+                      {"nombre":"logger","tipo":"logging"}
+                    ]
+                  },
+                  "utiliza": [
+                    {"ejecutable":["app"],"origen":"app_init.py","tipo":"variable"},
+                    {"ejecutable":["initialize_app"],"origen":"app_init.py","tipo":"funcion"},
+                    {"ejecutable":["initialize"],"origen":"kraken_api.py","tipo":"funcion"},
+                    {"ejecutable":["initialize","start_market_monitor"],"origen":"trading_logic.py","tipo":"funcion"}
+                  ]
+                },
+                "market_data.py": {
+                  "declara": {
+                    "funciones": [
+                        "fetch_historical_data",
+                        "get_kraken_signature",
+                        "get_account_balance",
+                        "cancel_order",
+                        "execute_kraken_trade",
+                        "fetch_historical_data"
+                    ],
+                    "clases": [],
+                    "Blueprints":[],
+                    "Decoradores":[],
+                    "variables":[]
+                  },
+                  "utiliza": []
+                },
+                "routes.py": {
+                  "declara": {
+                    "funciones": [
+                        "load_translations",
+                        "get_translated_text",
+                        "home",
+                        "finances_route",
+                        "request_withdrawal",
+                        "confirm_withdrawal",
+                        "send_withdrawal_email",
+                        "submit_support_request",
+                        "settings_password_route",
+                        "profile_route",
+                        "update_profile",
+                        "settings_route",
+                        "classes_route",
+                        "settings_2fa_route",
+                        "change_language",
+                        "stop_ai_trading",
+                        "update_trading_mode",
+                        "get_balance",
+                        "get_cryptos",
+                        "upload_class",
+                        "generate_access_link",
+                        "generate_referral_link",
+                        "request_teleclass_access",
+                        "settings_wallet_route",
+                        "get_current_symbol"
+                    ],
+                    "clases": [],
+                    "Blueprints":[],
+                    "Decoradores":["@routes"],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"ejecutable":["User","ReferralLink","Withdrawal","Investment","Strategy"],"origen":"shared_model.py","tipo":"clase"},
+                    {"ejecutable":["KrakenFuturesAPI"],"origen":"kraken_api.py","tipo":"clase"},
+                    {"ejecutable":["cancel_order","get_account_balance","execute_kraken_trade","fetch_historical_data"],"origen":"market_data.py","tipo":"funcion"},
+                    {"ejecutable":["evaluate_strategy_performance","start_market_monitor","stop_market_monitor"],"origen":"trading_logic.py","tipo":"funcion"},
+                    {"ejecutable":["db"],"origen":"shared_resources.py","tipo":"variable"}
+                  ]
+                },
+                "shared_models.py": {
+                  "declara": {
+                    "funciones": [],
+                    "clases": {
+                      "User": ["__repr__"],
+                      "ReferralLink": ["__repr__"],
+                      "Withdrawal": ["__repr__"],
+                      "Investment": ["__repr__"],
+                      "Strategy":["__repr__"]
+                    },
+                    "Blueprints":[],
+                    "Decoradores":[],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"funcion": "db", "origen": "shared_resources.py","tipo":"variable"}
+                  ]
+                },
+                "shared_resources.py": {
+                  "declara": {
+                    "funciones": [],
+                    "clases": {},
+                    "Blueprints":[],
+                    "Decoradores":[],
+                    "instancias":[
+                      {"nombre":"app","tipo":"Flask"},
+                      {"nombre":"db","tipo":"SQLAlchemy"}
+                    ]
+                  },
+                  "utiliza": []
+                },
+                "trading_logic.py": {
+                  "declara": {
+                    "funciones": [
+                        "initialize", 
+                        "evaluate_strategy_performance", 
+                        "start_market_monitor", 
+                        "stop_market_monitor",
+                        "detect_candlestick_patterns",
+                        "calculate_stop_loss_take_profit",
+                        "monitor_market",
+                        "set_trading_mode"
+        
+                    ],
+                    "clases": {},
+                    "Blueprints":[],
+                    "Decoradores":[],
+                    "variables":[]
+                  },
+                  "utiliza": [
+                    {"ejecutable": ["get_account_balance","fetch_historical_data", "execute_kraken_trade"], "origen": "market_data.py", "tipo":"funcion"},
+                    {"ejecutable":["Strategy"],"origen":"shared_models.py","tipo":"clase"},
+                    {"ejecutable":["KrakenFururesAPI"],"origen":"Kraken_api.py","tipo":"clase"}
+                  ]
+                }
+              },
+          "migrations": {
+            "archivos": [
+              "000_example.sql",
+              "001_create_strategy_table.sql",
+              "002_create_users_table.sql",
+              "003_update_users_table.sql",
+              "004_add_phone_to_users.sql",
+              "005_create_investments_table.sql",
+              "006_create_withdrawals_table.sql",
+              "007_create_teleclass_tables.sql",
+              "008_create_teleclass_requests_table.sql",
+              "009_update_withdrawals_table.sql",
+              "010_create_referral_links_table.sql",
+              "011_add_referred_by_to_referral_links.sql"
+            ]
+          },
+          "static": {
+            "css": {
+              "archivos": [
+                "chart.css",
+                "classes.css",
+                "finances.css",
+                "styles.css"
+              ]
+            },
+            "js": {
+              "archivos": {
+                "ai_trading.js":{
+                    "declara":{
+
+                      "funciones": [
+                            {"nombre":"updateAITradingInfo","tipo":["declarada"]},
+                            {"nombre":"getTradeSettings","tipo":["declarada"]},
+                            {"nombre":"startAITrading","tipo":["declarada","asincrona"]},
+                            {"nombre":"stopAITrading","tipo":["declarada"]},
+                            {"nombre":"updateTradingMode","tipo":["declarada"]}
+                          ],
+                      "eventos": [
+                        {"tipo": "DOMContentLoaded", "elemento": "document"}
+                          ],
+                      "variables": [
+                            "isAITrading",
+                            "tradingMode",
+                            "useCustomStrategies",
+                            "customStrategy",
+                            "sendStrategyButton",
+                            "strategyModeButton"
+                          ],
+                      "estructuras_de_control": [
+                        {"tipo": "if", "condicion": "sendStrategyButton"},
+                        {"tipo": "if", "condicion": "strategyModeButton"},
+                        {"tipo": "if", "condicion": "document.getElementById('send-strategy')"}
+                          ]
+                    },
+                    "utiliza":[
+
+                    ]
+                },
+                "chart.js":{
+                    "declara":{
+                        "funciones": [
+                           {"nombre":"updateBalance","tipo":["declarada","asincrona"]},
+                           {"nombre":"fetchCryptos","tipo":["declarada","asincrona"]},
+                           {"nombre":"updateTradingSymbol","tipo":["declarada","asincrona"]},
+                           {"nombre":"executeManualTrade","tipo":["declarada","asincrona"]},
+                           {"nombre":"handleTradeAction","tipo":["declarada","asincrona"]},
+                           {"nombre":"showReferralModal","tipo":["anonima","asignada"]},
+                           {"nombre":"generateReferralLink","tipo":["anonima","asignada"]},
+                           {"nombre":"copyFixedTronAddress","tipo":["anonima","asignada"]},
+                           {"nombre":"showInvestmentWarning","tipo":["anonima","asignada"]},
+                           {"nombre":"copyInputTronAddress","tipo":["anonima","asignada"]},
+                           {"nombre":"closeInvestmentModal","tipo":["anonima","asignada"]}
+                           ],
+                        "eventos": [
+                           {"tipo": "DOMContentLoaded", "elemento": "document"},
+                           {"tipo": "click", "elemento": "window"}
+
+                           ],
+                         "variables": [
+                             "widget"
+                          ],
+                         "estructuras_de_control": []
+                      },
+                    "utiliza":[
+                        
+                      ]
+                },
+                "profile.js": {
+                     "declara": {
+
+                       "funciones": [       
+                          {"nombre":"showMessage","tipo":["declarada"]}
+                         ],
+                       "eventos": [
+                          {"tipo": "DOMContentLoaded", "elemento": "document"},
+                          {"tipo": "submit", "elemento": "profileForm"},
+                          {"tipo": "change", "elemento": "emailInput"}
+                         ],
+                       "variables": [
+                          "profileForm",
+                          "messageDiv",
+                          "emailInput",
+                          "originalEmail"
+                         ],
+                       "estructuras_de_control": []
+                     },
+                     "utiliza": []
+                },
+                "classes.js":{
+                    "declara":{
+                        "funciones": [
+                          {"nombre":"copyLink","tipo":["declarada"]},
+                          {"nombre":"toggleReferralMenu","tipo":["declarada"]},
+                          {"nombre":"loadClasses","tipo":["declarada"]}
+                        ],
+                        "eventos": [
+                           {"tipo": "DOMContentLoaded", "elemento": "document"},
+                           {"tipo": "submit", "elemento": "uploadClassForm"},
+                           {"tipo": "submit", "elemento": "generateLinkForm"},
+                           {"tipo": "submit", "elemento": "requestAccessForm"}
+                        ],
+                         "variables": [],
+                         "estructuras_de_control": [
+                          {"tipo": "if", "condicion": "uploadClassForm"},
+                          {"tipo": "if", "condicion": "generateLinkForm"},
+                          {"tipo": "if", "condicion": "requestAccessForm"}
+                         ]
+
+                    },
+                    "utiliza":[
+                        
+                    ]
+                },
+                "finances.js":{
+                    "declara":{
+                        "funciones": [],
+                        "eventos": [
+                          {"tipo": "DOMContentLoaded", "elemento": "document"},
+                          {"tipo": "change", "elemento": "currencySelect"},
+                          {"tipo": "submit", "elemento": "withdrawalForm"}
+                        ],
+                         "variables": [],
+                         "estructuras_de_control": [
+                          {"tipo": "if", "condicion": "currencySelect"},
+                          {"tipo": "if", "condicion": "withdrawalForm"}
+                         ]
+                        },
+                    "utiliza":[                        
+                    ]
+                },
+                "header.js":{
+                    "declara":{
+                      "funciones":[
+                        {"nombre":"handleLanguageChange","tipo":["declarada","asincrona"]},
+                        {"nombre":"toggleMobileSetting","tipo":["declarada"]}
+                      ],
+                      "eventos":[
+                        {"tipo": "DOMContentLoaded", "elemento": "document"},
+                        {"tipo": "click", "elemento": "document"},
+                        {"tipo":"click","elemento":"mobileMenuButton"}
+                      ],
+                      "variables":[],
+                      "estructuras_de_control":[
+                        {"tipo": "if", "condicion": "languageSelect"},
+                        {"tipo":"if","condicion":"mobileLanguageSelect"}
+                      ]
+                    },
+                    "utiliza":[
+                        
+                    ]
+                },
+                "password.js":{
+                    "declara":{
+                      "funciones":[
+                        {"nombre":"showMessage","tipo":["declarada"]}
+                      ],
+                      "eventos":[
+                        {"tipo": "DOMContentLoaded", "elemento": "document"},
+                        {"tipo": "submit", "elemento": "passwordForm"}
+                      ],
+                      "variables":[],
+                      "estructuras_de_control":[]
+                    },
+                    "utiliza":[
+                        
+                    ]
+                },
+                "wallet":{
+                  "declara":{
+                    "funciones":[
+                      {"nombre":"showMessage","tipo":["declarada"]}
+                    ],
+                    "eventos":[
+                      {"tipo":"DOMContentLoaded","elemento":"document"},
+                      {"tipo":"submit","elemento":"walletForm"}
+                    ],
+                    "variables":[],
+                    "estructuras_de_control":[]
+                  },
+                  "utiliza":[
+                      
+                  ]
+
+                }
+
+            }
+            },
+            "uploads": {
+              "archivos": []
+            }
+          },
+          "templates": {
+            "archivos": [
+              "classes.html",
+              "comfirm_withdrawal.html",
+              "finances.html",
+              "home.html",
+              "profile.html",
+              "under_construction.html"
+            ],
+            "partials": {
+              "archivos": [
+                "_desktop_header.html",
+                "_header.html",
+                "_mobile_header.html"
+              ]
+            },
+            "settings": {
+              "archivos": [
+                "password.html",
+                "wallet.html"
+              ]
+            }
+          }
+        }
+      }
+      
+    }
+  }
+  
+
+
+
+  
