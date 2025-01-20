@@ -62,7 +62,7 @@ async function fetchCryptos() {
             const li = document.createElement('li');
             li.textContent = `${crypto.symbol}: $${parseFloat(crypto.price).toFixed(2)}`;
             li.addEventListener('click', () => {
-                updateTradingSymbol(crypto.symbol);
+                //updateTradingSymbol(crypto.symbol);
                 // Show manual trading controls for this symbol
                 document.getElementById('manual-trading-controls').classList.remove('hidden');
                 document.getElementById('manual-trade-symbol').textContent = crypto.symbol;
@@ -73,18 +73,13 @@ async function fetchCryptos() {
     }
 }
 
-// Function to update trading symbol
-async function updateTradingSymbol(symbol) {
+const updateTradingSymbol = async function(symbol){
     try {
         // First get current symbol from backend
         const response = await fetch('/get_current_symbol');
         const data = await response.json();
-        
-        // Use provided symbol or fallback to current symbol from backend
-        const symbolToUse = symbol || data.symbol;
-        
-        const container = document.getElementById('tradingview_chart');
-        container.innerHTML = '';
+        const symbolToUse = symbol || data.symbol;  
+        console.log(`Estoy en la ruta app/iu/static/js/chart.js:updateTradingSymbol: ${data.symbol}`)
         window.tradingViewWidget = new TradingView.widget({
             "width": "100%",
             "height": 500,
@@ -105,19 +100,18 @@ async function updateTradingSymbol(symbol) {
                 "StochasticRSI@tv-basicstudies"
             ],
             "container_id": "tradingview_chart",
-            "autosize": true,
+            "autosize": false,
             "hide_top_toolbar": false,
             "save_image": true,
             "show_popup_button": true
         });
-        
-        // Store current symbol in window object for manual trading
         window.currentTradingSymbol = symbolToUse;
-        
     } catch (error) {
         console.error('Error updating symbol:', error);
     }
+
 }
+
 
 // Function to execute manual trade
 async function executeManualTrade(action) {
@@ -220,72 +214,72 @@ async function handleTradeAction(action, symbol) {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize TradingView widget with only BTC/USDT pair
-    let widget = new TradingView.widget({
-        "width": "100%",
-        "height": 500,
-        "symbol": "KRAKEN:XBTUSDT",
-        "interval": "15",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": true,
-        "allow_symbol_change": false,
-        "studies": [
-            "RSI@tv-basicstudies",
-            "MACD@tv-basicstudies",
-            "StochasticRSI@tv-basicstudies"
-        ],
-        "container_id": "tradingview_chart",
-        "autosize": true,
-        "hide_top_toolbar": false,
-        "save_image": false,
-        "show_popup_button": false,
-        "disabled_features": [
-            "header_symbol_search",
-            "symbol_search_hot_key",
-            "header_compare",
-            "header_settings",
-            "header_screenshot",
-            "header_fullscreen_button",
-            "compare_symbol",
-            "border_around_the_chart",
-            "header_undo_redo",
-            "show_chart_property_page",
-            "symbol_info",
-            "symbol_search_hot_key",
-            "pane_context_menu",
-            "scales_context_menu",
-            "legend_context_menu",
-            "main_series_scale_menu",
-            "display_market_status",
-            "remove_library_container_border",
-            "create_volume_indicator_by_default",
-            "create_volume_indicator_by_default_once",
-            "volume_force_overlay"
-        ],
-        "enabled_features": [],
-        "overrides": {
-            "mainSeriesProperties.candleStyle.upColor": "#00ff00",
-            "mainSeriesProperties.candleStyle.downColor": "#ff0000",
-            "mainSeriesProperties.candleStyle.drawWick": true,
-            "mainSeriesProperties.candleStyle.drawBorder": true,
-            "mainSeriesProperties.candleStyle.borderColor": "#378658",
-            "mainSeriesProperties.candleStyle.borderUpColor": "#00ff00",
-            "mainSeriesProperties.candleStyle.borderDownColor": "#ff0000",
-            "mainSeriesProperties.candleStyle.wickUpColor": "#00ff00",
-            "mainSeriesProperties.candleStyle.wickDownColor": "#ff0000"
-        },
-        "loading_screen": { backgroundColor: "#2d3748" },
-        "custom_css_url": "/static/css/chart.css",
-        "library_path": "https://s3.tradingview.com/tv.js",
-        "fullscreen": false,
-        "drawings_access": { type: "black", tools: [] },
-        "saved_data": null,
-        "auto_save_delay": 0
-    });
+    // let widget = new TradingView.widget({
+    //     "width": "100%",
+    //     "height": 500,
+    //     "symbol": "KRAKEN:XBTUSDT",
+    //     "interval": "15",
+    //     "timezone": "Etc/UTC",
+    //     "theme": "dark",
+    //     "style": "1",
+    //     "locale": "en",
+    //     "toolbar_bg": "#f1f3f6",
+    //     "enable_publishing": false,
+    //     "hide_side_toolbar": true,
+    //     "allow_symbol_change": false,
+    //     "studies": [
+    //         "RSI@tv-basicstudies",
+    //         "MACD@tv-basicstudies",
+    //         "StochasticRSI@tv-basicstudies"
+    //     ],
+    //     "container_id": "tradingview_chart",
+    //     "autosize": true,
+    //     "hide_top_toolbar": false,
+    //     "save_image": false,
+    //     "show_popup_button": false,
+    //     "disabled_features": [
+    //         "header_symbol_search",
+    //         "symbol_search_hot_key",
+    //         "header_compare",
+    //         "header_settings",
+    //         "header_screenshot",
+    //         "header_fullscreen_button",
+    //         "compare_symbol",
+    //         "border_around_the_chart",
+    //         "header_undo_redo",
+    //         "show_chart_property_page",
+    //         "symbol_info",
+    //         "symbol_search_hot_key",
+    //         "pane_context_menu",
+    //         "scales_context_menu",
+    //         "legend_context_menu",
+    //         "main_series_scale_menu",
+    //         "display_market_status",
+    //         "remove_library_container_border",
+    //         "create_volume_indicator_by_default",
+    //         "create_volume_indicator_by_default_once",
+    //         "volume_force_overlay"
+    //     ],
+    //     "enabled_features": [],
+    //     "overrides": {
+    //         "mainSeriesProperties.candleStyle.upColor": "#00ff00",
+    //         "mainSeriesProperties.candleStyle.downColor": "#ff0000",
+    //         "mainSeriesProperties.candleStyle.drawWick": true,
+    //         "mainSeriesProperties.candleStyle.drawBorder": true,
+    //         "mainSeriesProperties.candleStyle.borderColor": "#378658",
+    //         "mainSeriesProperties.candleStyle.borderUpColor": "#00ff00",
+    //         "mainSeriesProperties.candleStyle.borderDownColor": "#ff0000",
+    //         "mainSeriesProperties.candleStyle.wickUpColor": "#00ff00",
+    //         "mainSeriesProperties.candleStyle.wickDownColor": "#ff0000"
+    //     },
+    //     "loading_screen": { backgroundColor: "#2d3748" },
+    //     "custom_css_url": "/static/css/chart.css",
+    //     "library_path": "https://s3.tradingview.com/tv.js",
+    //     "fullscreen": false,
+    //     "drawings_access": { type: "black", tools: [] },
+    //     "saved_data": null,
+    //     "auto_save_delay": 0
+    // });
     // Referral menu functions
     window.showReferralModal = async function() {
         try {
@@ -442,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set up periodic updates
     setInterval(updateBalance, 30000); // Update balance every 30 seconds
     setInterval(fetchCryptos, 60000); // Update cryptos every minute
-    setInterval(updateTradingSymbol, 60000); // Update symbol every minute
+    //setInterval(updateTradingSymbol, 6000); // Update symbol every minute
 
     // Investment modal functionality
     const investmentModal = document.getElementById('investment-modal');

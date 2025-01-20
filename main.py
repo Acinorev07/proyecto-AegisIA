@@ -1,12 +1,14 @@
+#proyecto_aegisia_main/main.py
 import logging
 import sys
-from flask import Flask, render_template
-from app_init import app, initialize_app
-from kraken_api import initialize as kraken_initialize
-from trading_logic import initialize as trading_initialize, start_market_monitor
-from routes import routes
+from flask import Flask
+from app.Aplicacion import Application
+from app.iu.routes import routes_bp
+from app.config import Config
+# from app.services.kraken_service import KrakenService
+# from app.services.trading_service import TradingService
 
-# Configure logging
+# Configuración del logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -16,48 +18,61 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def initialize_server():
-    """Initialize server components with proper error handling"""
+# Crear la instancia de la aplicación fuera del bloque principal
+#app = create_app()
+# # Crear instancia de la aplicación
+
+app_instance = Application(Config)
+
+def initialize_server(
+    app_instance
+    ):
+    """Inicializa los componentes del servidor con el manejo adecuado de errores."""
     try:
-        logger.info("Starting application initialization...")
-        initialize_app()
-        logger.info("App initialized successfully")
+
+
+        logger.info("Iniciando la inicialización de la aplicación...")
         
-        logger.info("Initializing Kraken API...")
-        kraken_initialize()
-        logger.info("Kraken API initialized successfully")
-        
-        logger.info("Initializing trading system...")
-        trading_initialize()
-        logger.info("Trading system initialized successfully")
-        
-        logger.info("Starting market monitor...")
-        # start_market_monitor()
-        logger.info("Market monitor started successfully")
-        
+        with app_instance.app_context():
+            logger.info("Inicializando la API de Kraken...")
+            #kraken_service = KrakenService()
+            #kraken_service.initialize()
+            logger.info("API de Kraken inicializada exitosamente")
+            
+            logger.info("Inicializando el sistema de trading...")
+            #trading_service = TradingService()
+            #trading_service.initialize()
+            logger.info("Sistema de trading inicializado exitosamente")
+            
+            logger.info("Iniciando el monitor de mercado...")
+            # start_market_monitor()  # Asegúrate de que esta función esté bien definida
+            logger.info("Monitor de mercado iniciado exitosamente")
+            
         return True
     except Exception as e:
-        logger.error(f"Initialization error: {str(e)}", exc_info=True)
+        logger.error(f"Error de inicialización: {str(e)}", exc_info=True)
         return False
-# Registrar el Blueprint
-app.register_blueprint(routes)
+
 # Add a test route to verify the server is running
-@app.route('/test')
-def test():
-    return "Server is running!"
+# @app.route('/test')
+# def test():
+#     return "Server is running!"
 
 if __name__ == "__main__":
+    # # Registrar Blueprints si es necesario
+    app_instance.register_blueprint(routes_bp)
     try:
-        logger.info("Starting server initialization...")
+        logger.info("Iniciando la inicialización del servidor...")
         
-        if not initialize_server():
-            logger.error("Server initialization failed. Exiting.")
+        if not initialize_server(app_instance):
+            logger.error("La inicialización del servidor falló. Saliendo.")
             sys.exit(1)
         
-        logger.info("Starting Flask development server...")
-        # Run Flask development server with threaded=True for better performance
-        app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+        logger.info("Iniciando el servidor de desarrollo de Flask...")
+        # Ejecutar el servidor de desarrollo de Flask con threaded=True para un mejor rendimiento
+        # app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+        app_instance.run()
         
     except Exception as e:
-        logger.error(f"Failed to start the server: {e}", exc_info=True)
+        logger.error(f"Error al iniciar el servidor: {e}", exc_info=True)
         sys.exit(1)

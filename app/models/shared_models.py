@@ -1,5 +1,8 @@
+#proyecto_aegisia_main/app/models/shared_models.py
+
 import logging
-from shared_resources import db
+from app.models.create_db import db
+# from app.Aplicacion import db 
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)

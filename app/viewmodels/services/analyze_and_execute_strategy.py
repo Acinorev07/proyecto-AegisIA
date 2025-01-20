@@ -6,7 +6,7 @@ from routes import routes
 
 logger = logging.getLogger(__name__)
 # Crear instancia de Flask 
-app = Flask(__name__)
+# app = Flask(__name__)
 analyze_and_execute_strategy_bp = Blueprint('analyze_and_execute_strategy', __name__)
 
 @analyze_and_execute_strategy_bp.route('/analyze_and_execute_strategy', methods=['POST'])

@@ -1,9 +1,9 @@
-from shared_resources import app
+
 
 import os
 from flask import current_app, session, jsonify, request, Blueprint, render_template, url_for, redirect
 from werkzeug.utils import secure_filename
-from shared_models import  User, ReferralLink, Withdrawal, Investment, Strategy, logger
+from app.models.shared_models import  User, ReferralLink, Withdrawal, Investment, Strategy, logger
 from email.mime.text import MIMEText
 import urllib.parse
 import secrets
@@ -13,9 +13,9 @@ import telegram
 import urllib.parse
 import os
 from werkzeug.security import generate_password_hash
-from kraken_api import KrakenFuturesAPI
-from market_data import cancel_order, get_account_balance, execute_kraken_trade, fetch_historical_data
-from trading_logic import evaluate_strategy_performance, start_market_monitor, stop_market_monitor
+from app.viewmodels.api.kraken_api import KrakenFuturesAPI
+from app.viewmodels.api.market_data import cancel_order, get_account_balance, execute_kraken_trade, fetch_historical_data
+from app.viewmodels.services.trading_logic import evaluate_strategy_performance, start_market_monitor, stop_market_monitor
 from sqlalchemy.exc import SQLAlchemyError
 
 import logging
@@ -23,7 +23,7 @@ import telegram
 import requests
 import pandas as pd
 import json
-from shared_resources import db
+from app.Aplicacion import db
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,12 +47,12 @@ def get_translated_text(key, language='en'):
         logger.error(f"Error getting translation for {key}: {e}")
         return key
 
-routes = Blueprint("routes", __name__)
+routes_bp = Blueprint("routes", __name__)
 
 # Removed manual trading route as per request
 # Initialize Telegram Bot with a valid token 
 
-@routes.route("/")
+@routes_bp.route("/")
 def home():
     """Home page route"""
     try:
@@ -108,14 +108,14 @@ def home():
         logger.error(f"Error in home route: {e}")
         return render_template("home.html", error=str(e),get_translated_text=get_translated_text)
 
-@routes.route("/finances")
+@routes_bp.route("/finances")
 def finances_route():
     """Finances page route"""
     try:
         # Get test user (or current user in production)
         user = User.query.filter_by(email='test@example.com').first()
         if not user:
-            return render_template("finances.html", error="User not found")
+            return render_template("finances.html", error="User not found",get_translated_text=get_translated_text)
         
         # Get user's investments
         investments = Investment.query.filter_by(user_id=user.id).all()
@@ -138,13 +138,14 @@ def finances_route():
             daily_percentage=daily_percentage,
             monthly_percentage=monthly_percentage,
             investments=investments,
-            withdrawals=withdrawals
+            withdrawals=withdrawals,
+            get_translated_text=get_translated_text
         )
     except Exception as e:
         logger.error(f"Error in finances route: {e}")
-        return render_template("finances.html", error=str(e))
+        return render_template("finances.html", error=str(e),get_translated_text=get_translated_text)
 
-@routes.route("/request_withdrawal", methods=["POST"])
+@routes_bp.route("/request_withdrawal", methods=["POST"])
 def request_withdrawal():
     """Handle withdrawal requests"""
     try:
@@ -209,7 +210,7 @@ def request_withdrawal():
         logger.error(f"Error processing withdrawal request: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/confirm_withdrawal")
+@routes_bp.route("/confirm_withdrawal")
 def confirm_withdrawal():
     """Withdrawal confirmation page"""
     try:
@@ -284,7 +285,7 @@ TELEGRAM_WELCOME_MESSAGE = (
     "⏰ Tiempo de respuesta: 24 horas"
 )
 
-@routes.route("/submit_support_request", methods=["POST"])
+@routes_bp.route("/submit_support_request", methods=["POST"])
 def submit_support_request():
     """Handle support request submission"""
     try:
@@ -333,7 +334,7 @@ def submit_support_request():
         logger.error(f"Error submitting support request: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
         
-@routes.route("/settings/password", methods=["GET", "POST"])
+@routes_bp.route("/settings/password", methods=["GET", "POST"])
 def settings_password_route():
     """Settings password page route"""
     try:
@@ -361,13 +362,13 @@ def settings_password_route():
                 "message": "Password updated successfully"
             })
             
-        return render_template("settings/password.html")
+        return render_template("settings/password.html",get_translated_text=get_translated_text)
         
     except Exception as e:
         logger.error(f"Error in password settings: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/profile", methods=["GET", "POST"])
+@routes_bp.route("/profile", methods=["GET", "POST"])
 def profile_route():
     """Profile page route"""
     try:
@@ -431,7 +432,7 @@ def profile_route():
         logger.error(f"Error in profile route: {e}")
         return render_template("profile.html", error="Error loading profile")
 
-@routes.route("/update_profile", methods=["POST"])
+@routes_bp.route("/update_profile", methods=["POST"])
 def update_profile():
     """Update user profile"""
     try:
@@ -443,29 +444,29 @@ def update_profile():
         logger.error(f"Error updating profile: {e}")
         return jsonify({"error": str(e)}), 500
 
-@routes.route("/settings")
+@routes_bp.route("/settings")
 def settings_route():
     """Settings page route"""
-    return render_template("under_construction.html", page_name="Settings")
+    return render_template("under_construction.html", page_name="Settings",get_translated_text=get_translated_text)
 
-@routes.route("/classes")
+@routes_bp.route("/classes")
 def classes_route():
     """Classes page route"""
     try:
         # Get test user (admin)
         user = User.query.filter_by(email='test@example.com').first()
         is_admin = bool(user)  # For now, test user is admin
-        return render_template("classes.html", is_admin=is_admin)
+        return render_template("classes.html", is_admin=is_admin,get_translated_text=get_translated_text)
     except Exception as e:
         logger.error(f"Error in classes route: {e}")
-        return render_template("classes.html", error="Error loading classes")
+        return render_template("classes.html", error="Error loading classes",get_translated_text=get_translated_text)
 
-@routes.route("/settings/2fa")
+@routes_bp.route("/settings/2fa")
 def settings_2fa_route():
     """Settings 2FA page route"""
-    return render_template("under_construction.html", page_name="Enable 2FA")
+    return render_template("under_construction.html", page_name="Enable 2FA",get_translated_text=get_translated_text)
 
-@routes.route("/change_language", methods=["POST"])
+@routes_bp.route("/change_language", methods=["POST"])
 def change_language():
     """Change the application language."""
     try:
@@ -504,7 +505,7 @@ def change_language():
         logger.error(f"Error changing language: {e}")
         return jsonify({"error": str(e)}), 500
 
-@routes.route("/stop_ai_trading", methods=["POST"])
+@routes_bp.route("/stop_ai_trading", methods=["POST"])
 def stop_ai_trading():
     """Stop AI trading"""
     try:
@@ -514,7 +515,7 @@ def stop_ai_trading():
         logger.error(f"Error stopping AI trading: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/update_trading_mode", methods=["POST"])
+@routes_bp.route("/update_trading_mode", methods=["POST"])
 def update_trading_mode():
     """Update trading mode"""
     try:
@@ -528,7 +529,7 @@ def update_trading_mode():
         logger.error(f"Error updating trading mode: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/get_balance")
+@routes_bp.route("/get_balance")
 def get_balance():
     """Get account balance"""
     try:
@@ -548,7 +549,7 @@ def get_balance():
         logger.error(f"Error getting balance: {e}")
         return jsonify({"error": str(e)}), 500
 
-@routes.route("/get_cryptos")
+@routes_bp.route("/get_cryptos")
 def get_cryptos():
     """Get available cryptocurrencies"""
     try:
@@ -598,7 +599,7 @@ def get_cryptos():
         logger.error(f"Error getting cryptocurrencies: {e}")
         return jsonify({"error": str(e)}), 500
 
-@routes.route("/upload_class", methods=["POST"])
+@routes_bp.route("/upload_class", methods=["POST"])
 def upload_class():
     """Handle class video upload"""
     try:
@@ -632,7 +633,7 @@ def upload_class():
         logger.error(f"Error uploading class: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/generate_access_link", methods=["POST"])
+@routes_bp.route("/generate_access_link", methods=["POST"])
 def generate_access_link():
     """Generate access link for teleclasses"""
     try:
@@ -662,7 +663,7 @@ def generate_access_link():
         logger.error(f"Error generating access link: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/generate_referral_link", methods=["GET"])
+@routes_bp.route("/generate_referral_link", methods=["GET"])
 def generate_referral_link():
     """Generate referral link for current user and get referral tree"""
     try:
@@ -729,7 +730,7 @@ def generate_referral_link():
         logger.error(f"Error generating referral link: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/request_teleclass_access", methods=["POST"])
+@routes_bp.route("/request_teleclass_access", methods=["POST"])
 def request_teleclass_access():
     """Handle teleclass access requests"""
     try:
@@ -761,7 +762,7 @@ def request_teleclass_access():
         logger.error(f"Error submitting teleclass access request: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/settings/wallet", methods=["GET", "POST"])
+@routes_bp.route("/settings/wallet", methods=["GET", "POST"])
 def settings_wallet_route():
     """Settings wallet page route"""
     try:
@@ -795,7 +796,7 @@ def settings_wallet_route():
         logger.error(f"Error in wallet settings: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes.route("/get_current_symbol")
+@routes_bp.route("/get_current_symbol")
 def get_current_symbol():
     """Get current trading symbol"""
     try:

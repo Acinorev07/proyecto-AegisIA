@@ -1,12 +1,12 @@
 
 
-from market_data import get_account_balance, fetch_historical_data, execute_kraken_trade
+from app.viewmodels.api.market_data import get_account_balance, fetch_historical_data, execute_kraken_trade
 
 
 import os
 
-from shared_models import Strategy
-from kraken_api import KrakenFuturesAPI
+from app.models.shared_models import Strategy
+from app.viewmodels.api.kraken_api import KrakenFuturesAPI
 
 
 import logging

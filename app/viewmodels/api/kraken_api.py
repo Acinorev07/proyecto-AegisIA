@@ -1,9 +1,8 @@
-from market_data import get_account_balance
+from app.viewmodels.api.market_data import get_account_balance,execute_kraken_trade
 
 from flask import Blueprint, request, jsonify
-from market_data import execute_kraken_trade
 import logging
-
+import time
 logger = logging.getLogger(__name__)
 
 execute_trade_bp = Blueprint('execute_trade', __name__)
@@ -78,3 +77,17 @@ def execute_trade():
     except Exception as e:
         logger.error(f"Error in execute_trade: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+class KrakenFuturesAPI:
+    def __init__(self, api_key, api_secret):
+        self.api_key = api_key
+        self.api_secret = api_secret
+
+    def get_balance(self):
+        pass
+    def place_order(self, symbol, side, quantity, price = None, order_type='market'):
+        pass
+
+# def initialize(): 
+#     logger.info("Kraken API initialized")
