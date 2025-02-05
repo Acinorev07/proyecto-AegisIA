@@ -30,7 +30,7 @@
                             ".gitkeep"
                         ]
                     },
-                    "raiz":[]
+                    "raiz":[null]
                 },
                 "templates":{
                     "partials":{
@@ -78,8 +78,7 @@
                         "trading_logic.py"
                     ]
                 },
-                "raiz":[
-                ]
+                "raiz":[null]
             },
             "raiz":[
                 "Aplicacion.py",
@@ -121,8 +120,8 @@
         "main.py": {
             "declara": {
               "funciones": ["initialize_server","test"],
-              "clases": [],
-              "Blueprints":[],
+              "clases": [null],
+              "Blueprints":[null],
               "Decoradores":[
                 {"nombre":"@app.route","ruta":"test"}
               ],
@@ -135,12 +134,12 @@
                 {"ejecutable":["Application"],"origen":"Aplicacion.py","tipo":"clase"},
                 {"ejecutable":["routes_bp"],"origen":"routes.py","tipo":"Blueprint"}
               ],
-              "frontend":[]
+              "frontend":[null]
             }
         },
         "Aplicacion.py":{
             "declara":{
-                "funciones":[],
+                "funciones":[null],
                 "clases":{
                     "Application":[
                         "__init__",
@@ -150,24 +149,24 @@
                         "app_context"
                     ]
                 },
-                "Blueprints":[],
-                "Decoradores":[],
-                "instancias":[]
+                "Blueprints":[null],
+                "Decoradores":[null],
+                "instancias":[null]
             },
             "utiliza":{
               "backend":[
                 {"ejecutable":["db"],"origen":"create_db.py","tipo":"instancia de clase"}
               ],
-              "frontend":[]
+              "frontend":[null]
             }
         },
         "create_db.py":{
             "declara": {
-                "funciones": [],
-                "clases": [],
-                "Blueprints":[],
+                "funciones": [null],
+                "clases": [null],
+                "Blueprints":[null],
                 "Decoradores":[
-                  {"nombre":"","ruta":[]}
+                  {"nombre":"","ruta":[null]}
                 ],
                 "instancias":[
                   {"nombre":"db","tipo":"clase","origen":"SQLAlchemy"}
@@ -175,9 +174,9 @@
               },
               "utiliza": {
                 "backend":[
-                  {"ejecutable":[],"origen":"","tipo":""}
+                  {"ejecutable":[null],"origen":"null","tipo":"null"}
                 ],
-                "frontend":[]
+                "frontend":[null]
               }
         },
         "routes.py": {
@@ -209,7 +208,7 @@
                 "settings_wallet_route",
                 "get_current_symbol"
             ],
-            "clases": [],
+            "clases": [null],
             "Blueprints":[
                 "route_bp"
             ],
@@ -270,7 +269,7 @@
         },
         "shared_models.py": {
           "declara": {
-            "funciones": [],
+            "funciones": [null],
             "clases": {
               "User": ["__repr__"],
               "ReferralLink": ["__repr__"],
@@ -278,8 +277,8 @@
               "Investment": ["__repr__"],
               "Strategy":["__repr__"]
             },
-            "Blueprints":[],
-            "Decoradores":[],
+            "Blueprints":[null],
+            "Decoradores":[null],
             "instancias":[
                 {"nombre":"logger","tipo":"objeto","origen":"logging.getLogger"}
             ]
@@ -288,7 +287,7 @@
             "backend":[
               {"funcion": "db", "origen": "create_db.py","tipo":"instancia de clase"}
             ],
-            "frontend":[]
+            "frontend":[null]
           }
         },
         "kraken_api.py": {
@@ -318,7 +317,7 @@
               "backend":[
                 {"ejecutable": ["get_account_balance","execute_kraken_trade"], "origen": "market_data.py"}
               ],
-              "frontend":[]
+              "frontend":[null]
             }
         },
         "market_data.py": {
@@ -330,16 +329,16 @@
                   "cancel_order",
                   "execute_kraken_trade"
               ],
-              "clases": [],
-              "Blueprints":[],
-              "Decoradores":[],
+              "clases": [null],
+              "Blueprints":[null],
+              "Decoradores":[null],
               "instancias":[
                 {"nombre":"logger","tipo":"objeto","origen":"logging.getLogger"}
               ]
             },
             "utiliza": {
-              "backend":[],
-              "frontend":[]
+              "backend":[null],
+              "frontend":[null]
             }
           },
         "trading_logic.py": {
@@ -356,8 +355,8 @@
   
               ],
               "clases": {},
-              "Blueprints":[],
-              "Decoradores":[],
+              "Blueprints":[null],
+              "Decoradores":[null],
               "instancias":[
                 {"nombre":"logger","tipo":"objeto","origen":"logging.getLogger"},
                 {"nombre":"market_data_queue","tipo":"instancia de clase","origen":"Queue"}
@@ -369,7 +368,7 @@
                 {"ejecutable":["Strategy"],"origen":"shared_models.py","tipo":"clase"},
                 {"ejecutable":["KrakenFururesAPI"],"origen":"Kraken_api.py","tipo":"clase"}
               ],
-              "frontend":[]
+              "frontend":[null]
             }
         },
         "analyze_and_execute_strategy.py":{
@@ -399,7 +398,7 @@
               {"ejecutable":["fetch_historical_data"],"origen":"market_data.py","tipo":"funcion"},
               {"ejecutable":["evaluate_strategy_performance"],"origen":"trading_logic.py","tipo":"funcion"}
             ],
-            "frontend":[]
+            "frontend":[null]
           }
         }
       }

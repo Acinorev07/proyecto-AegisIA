@@ -426,11 +426,11 @@ def profile_route():
                 logger.error(f"Error updating profile: {e}")
                 return jsonify({"status": "error", "message": str(e)}), 500
         
-        return render_template("profile.html", user=user)
+        return render_template("profile.html", user=user,get_translated_text=get_translated_text)
         
     except Exception as e:
         logger.error(f"Error in profile route: {e}")
-        return render_template("profile.html", error="Error loading profile")
+        return render_template("profile.html", error="Error loading profile",get_translated_text=get_translated_text)
 
 @routes_bp.route("/update_profile", methods=["POST"])
 def update_profile():
@@ -796,13 +796,57 @@ def settings_wallet_route():
         logger.error(f"Error in wallet settings: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@routes_bp.route("/get_current_symbol")
+# @routes_bp.route("/get_current_symbol")
+# def get_current_symbol():
+#     """Get current trading symbol"""
+#     try:
+#         trading_mode = current_app.config.get("TRADING_MODE", "spot")
+#         symbol = "BTCUSD"  # Use spot symbol for now
+#         return jsonify({"symbol": symbol})
+#     except Exception as e:
+#         logger.error(f"Error getting current symbol: {e}")
+#         return jsonify({"error": str(e)}), 500
+
+
+
+@routes_bp.route("/get_current_symbol", methods=["GET"])
 def get_current_symbol():
     """Get current trading symbol"""
     try:
-        trading_mode = current_app.config.get("TRADING_MODE", "spot")
-        symbol = "XBTUSD"  # Use spot symbol for now
+        # Agregar mensajes de depuración
+        print("Intentando acceder a current_symbol.txt")
+        
+        # Verificar si el archivo existe
+        if os.path.exists("current_symbol.txt"):
+            print("El archivo current_symbol.txt existe")
+            with open("current_symbol.txt", "r") as f:
+                symbol = f.read().strip()
+                print(f"Símbolo leído del archivo: {symbol}")
+        else:
+            print("El archivo current_symbol.txt no existe. Usando símbolo por defecto")
+            # Símbolo por defecto
+            symbol = "BTCUSD"
+
         return jsonify({"symbol": symbol})
     except Exception as e:
-        logger.error(f"Error getting current symbol: {e}")
+        print(f"Error al obtener el símbolo actual: {e}")
         return jsonify({"error": str(e)}), 500
+
+@routes_bp.route("/update_current_symbol", methods=["POST"])
+def update_current_symbol():
+    """Update current trading symbol"""
+    try:
+        data = request.get_json()
+        new_symbol = data.get("symbol")
+
+        # Guardar el símbolo en un archivo o base de datos en el servidor
+        with open("current_symbol.txt", "w") as f:
+            f.write(new_symbol)
+
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        logger.error(f"Error updating current symbol: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
