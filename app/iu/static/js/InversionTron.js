@@ -21,7 +21,7 @@ export default class InversionTron {
         const $warningModal = document.createElement('div');
         
         $investment_boton.addEventListener("click", () => {
-            $warningModal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full';
+            $warningModal.className = 'altura fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full';
             $warningModal.innerHTML = `
                 <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                     <div class="mt-3 text-center">
