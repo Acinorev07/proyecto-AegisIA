@@ -13,21 +13,26 @@ import telegram
 import urllib.parse
 import os
 from werkzeug.security import generate_password_hash
-from app.viewmodels.api.kraken_api import KrakenFuturesAPI
+
 from app.viewmodels.api.market_data import cancel_order, get_account_balance, execute_kraken_trade, fetch_historical_data
 from app.viewmodels.services.trading_logic import evaluate_strategy_performance, start_market_monitor, stop_market_monitor
 from sqlalchemy.exc import SQLAlchemyError
-
+from app.viewmodels.api.spot.KrakenSpotAPI import KrakenSpotAPI
+from app.viewmodels.api.futures.KrakenFuturesAPI import KrakenFuturesAPI
 import logging
 import telegram
 import requests
 import pandas as pd
 import json
 from app.Aplicacion import db
+
+from app.viewmodels.services.GetMethodTrading import GetMethodTrading
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Clases
+method_instance= GetMethodTrading()
 # Load translations
 def load_translations():
     try:
@@ -549,52 +554,50 @@ def get_balance():
         logger.error(f"Error getting balance: {e}")
         return jsonify({"error": str(e)}), 500
 
-@routes_bp.route("/get_cryptos")
+
+# Obtener metodo de trading por defecto
+@routes_bp.route("/get_method_trading")
+def get_method_trading():
+    """Get methos of trading"""
+    try:
+        trading_mode = method_instance.get_method()
+
+        return jsonify({"method": trading_mode})
+    except Exception as e:
+        logger.error(f"Error getting cryptocurrencies: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@routes_bp.route("/get_cryptos", methods=['POST'])
 def get_cryptos():
     """Get available cryptocurrencies"""
     try:
-        trading_mode = current_app.config.get("TRADING_MODE", "spot")
+        data = request.get_json()
+        # trading_mode = current_app.config.get("TRADING_MODE", "spot")
+        trading_mode = data.get("trading_mode")
+
+        logger.info(f"Estamos dentro de routes.py en la funcion get_cryptos Trading mode: {trading_mode}")
         if trading_mode == "futures":
+            logger.info(f"Estamos dentro de futures en routes.py")
             futures_client = KrakenFuturesAPI()
-            tickers = futures_client.get_tickers()
-            if tickers.get("error"):
-                return jsonify({"error": tickers["error"]}), 400
-            cryptos = [{"symbol": t["symbol"], "price": t["last"]} for t in tickers.get("tickers", [])]
-        else:
-            # For spot trading, get pairs from Kraken API
-            try:
-                response = requests.get("https://api.kraken.com/0/public/Ticker")
-                if response.status_code != 200:
-                    logger.error(f"Error fetching tickers: HTTP {response.status_code}")
-                    return jsonify({"error": "Failed to fetch tickers"}), 500
+            data, status = futures_client.get_ticker_kraken()
+            if status != 200:
+                return jsonify(data), status
 
-                data = response.json()
-                if "error" in data and data["error"]:
-                    logger.error(f"Kraken API error: {data['error']}")
-                    return jsonify({"error": str(data["error"])}), 500
-
-                result = data.get("result", {})
-                cryptos = []
-                for pair_name, ticker_info in result.items():
-                    if "c" in ticker_info:  # "c" contains the last trade closed price
-                        price = ticker_info["c"][0]  # First element is the price
-                        cryptos.append({
-                            "symbol": pair_name,
-                            "price": price
-                        })
-
-                if not cryptos:
-                    logger.error("No crypto data found in response")
-                    return jsonify({"error": "No crypto data found"}), 500
-
-                logger.info(f"Successfully fetched {len(cryptos)} cryptocurrencies")
-                return jsonify({"cryptos": cryptos})
-
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Network error fetching tickers: {e}")
-                return jsonify({"error": f"Network error: {str(e)}"}), 500
-
-        return jsonify({"cryptos": cryptos})
+            cryptos, status = futures_client.get_symbol_and_markPrice()
+            if status != 200:
+                return jsonify(cryptos), status
+            
+        elif trading_mode == "spot":
+            # Para trading spot. usar KrakenSpotApi
+            spot_client = KrakenSpotAPI()
+            data, status = spot_client.get_ticker_kraken()
+            if status != 200:
+                return jsonify(data), status
+            cryptos, status = spot_client.get_symbol_and_ultimate_price_trade()
+            if status != 200:
+                return jsonify(cryptos), status
+            
+        return jsonify(cryptos)
     except Exception as e:
         logger.error(f"Error getting cryptocurrencies: {e}")
         return jsonify({"error": str(e)}), 500
@@ -795,19 +798,6 @@ def settings_wallet_route():
     except Exception as e:
         logger.error(f"Error in wallet settings: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
-
-# @routes_bp.route("/get_current_symbol")
-# def get_current_symbol():
-#     """Get current trading symbol"""
-#     try:
-#         trading_mode = current_app.config.get("TRADING_MODE", "spot")
-#         symbol = "BTCUSD"  # Use spot symbol for now
-#         return jsonify({"symbol": symbol})
-#     except Exception as e:
-#         logger.error(f"Error getting current symbol: {e}")
-#         return jsonify({"error": str(e)}), 500
-
-
 
 @routes_bp.route("/get_current_symbol", methods=["GET"])
 def get_current_symbol():

@@ -8,6 +8,7 @@ from app.config import Config
 # from app.services.kraken_service import KrakenService
 # from app.services.trading_service import TradingService
 
+
 # Configuración del logging
 logging.basicConfig(
     level=logging.INFO,
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 # # Crear instancia de la aplicación
 
 app_instance = Application(Config)
+
 
 def initialize_server(
     app_instance

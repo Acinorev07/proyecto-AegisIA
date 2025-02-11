@@ -1,4 +1,4 @@
-export default function trade_in_spot(boton, manualTradingButton, aiTradingButton) {
+export default function method_trading(boton, manualTradingButton, aiTradingButton) {
     const d = document;
     const $spotButton = d.getElementById(boton);
     const $manTradBut = d.getElementById(manualTradingButton);
@@ -28,14 +28,14 @@ export default function trade_in_spot(boton, manualTradingButton, aiTradingButto
             $aiTradBut.classList.remove('hidden');
             $manTradBut.classList.add('hidden');
             $spotButton.textContent = "Trade in Spot";
-            ls.setItem("method", "Trade in Futures");
+            ls.setItem("method", "futures");
             console.log("Cambiamos a transacciones de futuros");
         } else {
             // Cambiar a modo de trading en spot
             $manTradBut.classList.remove('hidden');
             $aiTradBut.classList.add('hidden');
             $spotButton.textContent = "Trade in Futures";
-            ls.setItem("method", "Trade in Spot");
+            ls.setItem("method", "spot");
             console.log("Cambiamos a transacciones spot");
         }
 
