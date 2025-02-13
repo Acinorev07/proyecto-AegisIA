@@ -6,11 +6,13 @@ import ReferralLink from "./js/ReferralLink.js";
 import method_trading from "./js/MethodTrading.js";
 
 import get_method from "./js/get_method.js";
+import send_strategy from "./js/send_strategy.js";
+import get_historical_data from "./js/get_historical_data.js";
 
 const d = document;
 const ls = localStorage;
 
-d.addEventListener("DOMContentLoaded",async (e)=>{
+d.addEventListener("DOMContentLoaded", async (e)=>{
     const tvWidget = new TvWidget();
     const inversion = new InversionTron();
     const link_ref = new ReferralLink();
@@ -46,5 +48,10 @@ d.addEventListener("DOMContentLoaded",async (e)=>{
     //Esta funcion permite mediante el boton 'trading-mode-button' cambiar entre los controles
     // para operar en spot y en futuros, dependiendo del metodo en el que se encuentre
     method_trading('trading-mode-button','manual-trading-controls','ai-trading-controls');
+
+    send_strategy(null,'send-strategy','chat-input','strategy-mode-button','chat-messages');
+
+    let symbol = ls.getItem('symbol');
+    get_historical_data(symbol);
 
 });

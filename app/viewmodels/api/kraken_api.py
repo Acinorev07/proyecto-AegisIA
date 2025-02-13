@@ -79,15 +79,4 @@ def execute_trade():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-class KrakenFuturesAPI:
-    def __init__(self, api_key, api_secret):
-        self.api_key = api_key
-        self.api_secret = api_secret
 
-    def get_balance(self):
-        pass
-    def place_order(self, symbol, side, quantity, price = None, order_type='market'):
-        pass
-
-# def initialize(): 
-#     logger.info("Kraken API initialized")

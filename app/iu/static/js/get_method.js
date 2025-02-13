@@ -5,7 +5,7 @@ export default async function get_method() {
         let response = await fetch('/get_method_trading');
         let json = await response.json();
 
-        console.log(`Respuesta desde /get_method_trading en routes.py:`, json);
+        // console.log(`Respuesta desde /get_method_trading en routes.py:`, json);
 
         // Verificar si hay errores en la respuesta
         if (json.error && json.error.length > 0) {

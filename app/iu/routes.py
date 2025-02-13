@@ -839,4 +839,60 @@ def update_current_symbol():
         return jsonify({"error": str(e)}), 500
 
 
+@routes_bp.route("/analyze_and_execute_strategy", methods=["POST"])
+def analyze_and_execute_strategy():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"status": "error", "message": "No data provided"}), 400
 
+        symbol = data.get('symbol', 'XBTUSDT')
+        historical_data = fetch_historical_data(symbol)
+        if historical_data is None or historical_data.empty:
+            return jsonify({"status": "error", "message": "Could not fetch historical data"}), 400
+
+        performance, action, strategy_name, strategy_desc = evaluate_strategy_performance(
+            "Dynamic Strategy", historical_data, symbol, data.get('use_custom_strategies', False))
+
+        return jsonify({
+            "status": "success",
+            "performance": performance,
+            "action": action,
+            "strategy": strategy_name,
+            "description": strategy_desc
+        })
+    except Exception as e:
+        logger.error(f"Error in analyze_and_execute_strategy: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@routes_bp.route("/fetch_historical_data")
+def fetch_historical_data():
+    symbol = request.args.get("symbol", "XBTUSD")  # Símbolo por defecto: XBTUSD
+    interval = 15  # Intervalo de 15 minutos
+    since = int(time.time() - (30 * 24 * 60 * 60))  # Últimos 30 días
+
+    try:
+        url = "https://api.kraken.com/0/public/OHLC"
+        params = {
+            "pair": symbol,
+            "interval": interval,
+            "since": since
+        }
+
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            return jsonify({"error": f"HTTP error {response.status_code}: {response.text}"}), 400
+
+        data = response.json()
+        if "error" in data and data["error"]:
+            return jsonify({"error": f"Kraken API error: {data['error']}"}), 400
+
+        result = data.get("result", {})
+        if not result:
+            return jsonify({"error": "No historical data found"}), 400
+
+        pair_data = next(iter(result.values()))
+        return jsonify(pair_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

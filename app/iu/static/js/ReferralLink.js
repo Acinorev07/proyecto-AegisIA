@@ -11,12 +11,12 @@ export default class ReferralLink {
 
         if ($button_ref) {
             $button_ref.addEventListener("click", async (e) => {
-                console.log("Se detectó el click dentro del método ReferralLink.detectarClick", e.target);
+                // console.log("Se detectó el click dentro del método ReferralLink.detectarClick", e.target);
 
                 try {
                     const response = await fetch('/generate_referral_link');
                     const data = await response.json();
-                    console.log("Estamos dentro de la clase ReferralLink y estamos obteniendo el archivo json que se genera en el enlace", data);
+                    // console.log("Estamos dentro de la clase ReferralLink y estamos obteniendo el archivo json que se genera en el enlace", data);
                     
                     if (data.status === 'success') {
                         this.referral_link = data.referral_link;  // Almacenar el enlace de referencia

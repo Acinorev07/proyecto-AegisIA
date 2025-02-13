@@ -253,6 +253,7 @@ body {
 
 #chat-messages .text-right {
   background-color: #0c0c0c;
+  text-align: center;
 }
 
 #chat-messages .text-left {

@@ -10,7 +10,7 @@ export default async function get_cryptos(method,boton,cryptoList,cryptoSearch) 
 
     d.addEventListener("click", async e => {
 
-        console.log(`Estamos dentro del evento clic del dom en el archivo get_cryptos: ${e.target}`);
+        // console.log(`Estamos dentro del evento clic del dom en el archivo get_cryptos: ${e.target}`);
 
          $txtBox.addEventListener('input', function() {
             searchTerm = $txtBox.value;
@@ -19,13 +19,13 @@ export default async function get_cryptos(method,boton,cryptoList,cryptoSearch) 
 
         if ($fetchCryptos.contains(e.target)) {
 
-            console.log(`Estamos dentro del evento clic del boton crypto-search: ${e.target}`);
+            // console.log(`Estamos dentro del evento clic del boton crypto-search: ${e.target}`);
 
             if(searchTerm != null){
 
-                console.log(`Estamos dentro del evento clic del boton crypto-search y tambien dentro del condicional searchTerm: ${e.target}`);
-                console.log(`SearchTerm: ${searchTerm}`);
-                console.log("Metodo",metodo);
+                // console.log(`Estamos dentro del evento clic del boton crypto-search y tambien dentro del condicional searchTerm: ${e.target}`);
+                // console.log(`SearchTerm: ${searchTerm}`);
+                // console.log("Metodo",metodo);
 
                 try {
                     let response = await fetch('/get_cryptos',{
@@ -37,11 +37,11 @@ export default async function get_cryptos(method,boton,cryptoList,cryptoSearch) 
                     });
                     let json = await response.json();
 
-                    console.log(`Respuesta desde /get_cryptos en routes.py:`, json);
+                    // console.log(`Respuesta desde /get_cryptos en routes.py:`, json);
 
                     // Verificar si hay errores en la respuesta
                     if (json.error && json.error.length > 0) {
-                        console.error('Error en la respuesta de la API de Kraken:', json.error);
+                        // console.error('Error en la respuesta de la API de Kraken:', json.error);
                         return;
                     }
 
@@ -54,9 +54,10 @@ export default async function get_cryptos(method,boton,cryptoList,cryptoSearch) 
 
                             // Aqui se debe eliminar el caracter ":" de crypto.symbol
                             let crypto_symbol_mod = crypto.symbol.replace(/:/g, '');
-                            console.log("Simbolo", crypto_symbol_mod);
+                            // console.log("Simbolo", crypto_symbol_mod);
 
                             const $li = d.createElement('li');
+                            $li.setAttribute("id","lista-button");
                             $li.textContent = `${crypto_symbol_mod}: $${parseFloat(crypto.price).toFixed(2)}`;
                            
                             $cryptoList.appendChild($li);

@@ -20,7 +20,7 @@ export default function method_trading(boton, manualTradingButton, aiTradingButt
     }
 
     $spotButton.addEventListener("click", (e) => {
-        console.log("Estamos dentro del botón ", e.target);
+        // console.log("Estamos dentro del botón ", e.target);
 
         // Determinar que valor está en el local storage y alternar entre los modos
         if ($spotButton.textContent === 'Trade in Futures') {
@@ -29,17 +29,17 @@ export default function method_trading(boton, manualTradingButton, aiTradingButt
             $manTradBut.classList.add('hidden');
             $spotButton.textContent = "Trade in Spot";
             ls.setItem("method", "futures");
-            console.log("Cambiamos a transacciones de futuros");
+            // console.log("Cambiamos a transacciones de futuros");
         } else {
             // Cambiar a modo de trading en spot
             $manTradBut.classList.remove('hidden');
             $aiTradBut.classList.add('hidden');
             $spotButton.textContent = "Trade in Futures";
             ls.setItem("method", "spot");
-            console.log("Cambiamos a transacciones spot");
+            // console.log("Cambiamos a transacciones spot");
         }
 
-        console.log($spotButton.textContent);
+        // console.log($spotButton.textContent);
     });
 }
 

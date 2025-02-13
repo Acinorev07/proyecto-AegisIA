@@ -6,7 +6,7 @@ from app.viewmodels.api.market_data import get_account_balance, fetch_historical
 import os
 
 from app.models.shared_models import Strategy
-from app.viewmodels.api.kraken_api import KrakenFuturesAPI
+# from app.viewmodels.api.kraken_api import KrakenFuturesAPI
 
 
 import logging
