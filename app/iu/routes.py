@@ -25,14 +25,27 @@ import requests
 import pandas as pd
 import json
 from app.Aplicacion import db
-
+import numpy as np
+import tensorflow as tf
 from app.viewmodels.services.GetMethodTrading import GetMethodTrading
+
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Clases
 method_instance= GetMethodTrading()
+
+#Modelo IA
+def mse(y_true, y_pred):
+    return tf.keras.losses.mean_squared_error(y_true, y_pred)
+# Ruta relativa al archivo .h5
+ruta_modelo = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'Aegis-IA0003.h5')
+
+# Cargar el modelo
+modelo = tf.keras.models.load_model(ruta_modelo, custom_objects={'mse': mse})
+
+
 # Load translations
 def load_translations():
     try:
@@ -896,3 +909,42 @@ def fetch_historical_data():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@routes_bp.route('/predict', methods=['POST'])
+def predict():
+
+    try:
+
+        data = request.json
+
+        # Verifica si data es una cadena y conviértela a float
+        if isinstance(data, str):
+            data = float(data)
+
+        print(f"Estamos en la funcion predict y el valor que recibe es : {data}")
+    # features = data['close']
+
+    # print(f"Estamos en la funcion predict y el valor que recibe en features 1: {features}")
+    
+
+    # Convertir las características en un array de numpy
+        features = np.array([[float(data)]])
+        print(f"Estamos en la funcion predict y el valor que recibe en features 2: {features}")
+   
+
+        print(f"Features con forma correcta: {features.shape}")
+   
+   
+    # Hacer la predicción
+        prediction = modelo.predict(features)
+        print(f"Estamos en la funcion predict y el valor que recibe en prediction: {prediction}")
+        # Devolver la predicción en formato JSON
+        print(f"Predicción: {prediction}")
+        return jsonify({'prediction': prediction.tolist()})
+    except ValueError as e:
+        print(f"Error al convertir los datos: {e}")
+        return jsonify({'error': 'Error al convertir los datos', 'details': str(e)}), 400
+    except Exception as e:
+        print(f"Error al realizar la predicción: {e}")
+        return jsonify({'error': 'Error al realizar la predicción', 'details': str(e)}), 500
