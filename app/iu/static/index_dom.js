@@ -8,6 +8,7 @@ import method_trading from "./js/MethodTrading.js";
 import get_method from "./js/get_method.js";
 import send_strategy from "./js/send_strategy.js";
 import get_historical_data from "./js/get_historical_data.js";
+import add_order from "./js/add_order.js";
 
 const d = document;
 const ls = localStorage;
@@ -53,5 +54,7 @@ d.addEventListener("DOMContentLoaded", async (e)=>{
 
     let symbol = ls.getItem('symbol');
     get_historical_data(symbol);
+
+    add_order('add-order','order-type','type','amount',symbol)
 
 });

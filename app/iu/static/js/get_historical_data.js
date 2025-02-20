@@ -44,21 +44,10 @@ export default async function get_historical_data(symbol) {
             $historicTableBody.appendChild(row);
         });
 
-
-
         // // Obtener el ultimo registro
         const latestData = json[json.length-1];
         // // Creamos un arreglo para enviar al modelo
         const symbolData = latestData[4];
-        //     timestamp: latestData[0],
-        //     open: latestData[1],
-        //     high: latestData[2],
-        //     low: latestData[3],
-        //     close: latestData[4],
-        //     VWAP: latestData[5],
-        //     volume: latestData[6],
-        //     transactions: latestData[7]
-        // };
 
         console.log("Estamos dentro de la funcion get_historical_data-symbolData", symbolData);
          await predict(symbolData);

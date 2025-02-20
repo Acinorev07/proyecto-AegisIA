@@ -5,22 +5,18 @@ from flask import current_app, session, jsonify, request, Blueprint, render_temp
 from werkzeug.utils import secure_filename
 from app.models.shared_models import  User, ReferralLink, Withdrawal, Investment, Strategy, logger
 from email.mime.text import MIMEText
-import urllib.parse
 import secrets
 import time # Importar time desde la biblioteca estándar de Python
 import smtplib  # For sending emails
 import telegram
-import urllib.parse
-import os
 from werkzeug.security import generate_password_hash
-
 from app.viewmodels.api.market_data import cancel_order, get_account_balance, execute_kraken_trade, fetch_historical_data
 from app.viewmodels.services.trading_logic import evaluate_strategy_performance, start_market_monitor, stop_market_monitor
 from sqlalchemy.exc import SQLAlchemyError
-from app.viewmodels.api.spot.KrakenSpotAPI import KrakenSpotAPI
+from app.viewmodels.api.spot.KrakenSpotAPITicker import KrakenSpotAPI
 from app.viewmodels.api.futures.KrakenFuturesAPI import KrakenFuturesAPI
+from app.viewmodels.api.spot.KrakenSpotApiAddOrder import KrakenSpotApiAddOrder
 import logging
-import telegram
 import requests
 import pandas as pd
 import json
@@ -28,10 +24,18 @@ from app.Aplicacion import db
 import numpy as np
 import tensorflow as tf
 from app.viewmodels.services.GetMethodTrading import GetMethodTrading
-
+from dotenv import load_dotenv
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+#Iniciamos las variables de entorno desde el archivo .env
+load_dotenv()
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME")
+API_KEY_KRAKEN = os.getenv("API_KEY_KRAKEN")
+API_SECRET_KRAKEN = os.getenv("API_SECRET_KRAKEN")
 
 # Clases
 method_instance= GetMethodTrading()
@@ -287,8 +291,7 @@ def send_withdrawal_email(user, amount, currency, wallet_address):
         logger.error(f"Error sending withdrawal email: {e}")
 
 # Initialize Telegram bot
-bot = telegram.Bot(token='')
-TELEGRAM_BOT_USERNAME = 'Mysoportebot'
+bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
 TELEGRAM_BOT_LINK = f"https://t.me/{TELEGRAM_BOT_USERNAME}?start=welcome"
 TELEGRAM_START_COMMAND = '/start'
 TELEGRAM_WELCOME_MESSAGE = (
@@ -613,6 +616,55 @@ def get_cryptos():
         return jsonify(cryptos)
     except Exception as e:
         logger.error(f"Error getting cryptocurrencies: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+@routes_bp.route("/add_order", methods=["POST"])
+def add_order():
+    """
+    Recibe datos desde el front (por fetch) para crear una orden en Kraken.
+    Para modo spot, extrae los parámetros necesarios y llama a la clase KrakenSpotApiAddOrder.
+    """
+    try:
+        data = request.get_json()
+        trading_mode = data.get("trading_mode")
+        logger.info(f"Modo de trading recibido: {trading_mode}")
+
+        if trading_mode == "spot":
+            # Extraer los parámetros de la orden desde el JSON
+            ordertype = data.get("ordertype")    # e.g., "limit"
+            order_direction = data.get("type")     # "buy" o "sell"
+            volume = data.get("volume")            # volumen en activo base
+            symbol = data.get("symbol")            # par de trading, e.g., "XBTUSD"
+            price = data.get("price")              # precio límite (si aplica)
+
+            # Validar que los parámetros esenciales estén presentes
+            if not all([ordertype, order_direction, volume, symbol, price]):
+                return jsonify({"error": "Faltan parámetros requeridos"}), 400
+
+            # Crear una instancia de la clase para órdenes spot
+            spot_client = KrakenSpotApiAddOrder()
+            
+            # Llamar al método add_order pasando los parámetros y las credenciales (API_KEY_KRAKEN y API_SECRET_KRAKEN)
+            result = spot_client.add_order(
+                ordertype=ordertype,
+                order_type=order_direction,
+                volume=volume,
+                symbol=symbol,
+                price=price,
+                api_key=API_KEY_KRAKEN,
+                api_secret=API_SECRET_KRAKEN
+            )
+            return jsonify(result)
+        
+        elif trading_mode == "futures":
+            # Aquí podrías implementar la lógica para futuros o devolver un error si aún no está implementado.
+            return jsonify({"error": "Futures mode no implementado"}), 501
+
+        else:
+            return jsonify({"error": "Modo de trading inválido"}), 400
+
+    except Exception as e:
+        logger.error(f"Error en add_order: {e}")
         return jsonify({"error": str(e)}), 500
 
 @routes_bp.route("/upload_class", methods=["POST"])
