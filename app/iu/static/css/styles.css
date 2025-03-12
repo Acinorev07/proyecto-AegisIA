@@ -352,3 +352,36 @@ body {
     display: block;
   }
 }
+
+.account-balance-container {
+  background-color: #f9fafb; /* Fondo ligero */
+  border: 1px solid #e5e7eb; /* Borde suave */
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.account-balance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff; /* Fondo blanco */
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.balance-item .asset {
+  font-weight: bold;
+  color: #4b5563; /* Texto gris oscuro */
+}
+
+.balance-item .amount {
+  color: #10b981; /* Verde brillante */
+  font-weight: bold;
+}

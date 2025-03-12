@@ -9,7 +9,7 @@ export default async function get_historical_data(symbol) {
         console.error("No se encontró el cuerpo de la tabla histórica.");
         return;
     }
-    console.log("Estamos dentro de la funcion get_historical_data_1", symbol);
+    // console.log("Estamos dentro de la funcion get_historical_data_1", symbol);
     try {
         // Obtener los datos históricos desde la API de Kraken
         const response = await fetch(`/fetch_historical_data?symbol=${symbol}`);
@@ -49,12 +49,12 @@ export default async function get_historical_data(symbol) {
         // // Creamos un arreglo para enviar al modelo
         const symbolData = latestData[4];
 
-        console.log("Estamos dentro de la funcion get_historical_data-symbolData", symbolData);
+        // console.log("Estamos dentro de la funcion get_historical_data-symbolData", symbolData);
          await predict(symbolData);
 
 
 
-        console.log("Datos históricos cargados correctamente.");
+        // console.log("Datos históricos cargados correctamente.");
     } catch (error) {
         console.error('Error al obtener los datos históricos:', error);
     }

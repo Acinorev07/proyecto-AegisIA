@@ -7,6 +7,7 @@ import time
 import hashlib
 import hmac
 import base64
+from app.viewmodels.services.GenerateApiSign import GenerateApiSign
 
 logger = logging.getLogger(__name__)
 
@@ -14,32 +15,6 @@ class KrakenSpotApiAddOrder:
     def __init__(self):
         self.__endpoint = "https://api.kraken.com/0/private/AddOrder"
         self.data = None
-
-    def _generate_api_sign(self, url_path, data, api_secret):
-        """
-        Genera el API-Sign requerido por Kraken.
-
-        Pasos básicos (consulta la documentación de Kraken para más detalles):
-          1. Concatenar el nonce y el payload (data) en una cadena.
-          2. Hacer un hash SHA256 de esa cadena.
-          3. Concatenar el path de la API (por ejemplo, '/0/private/AddOrder') con el hash obtenido.
-          4. Usar HMAC SHA512 con la clave secreta (decodificada de base64) para firmar el resultado.
-          5. Codificar el resultado en base64.
-        """
-        postdata = data
-        # Paso 1: extraer el nonce
-        nonce = postdata.get("nonce")
-        postdata_encoded = (str(nonce) + json.dumps(postdata)).encode()
-        # Paso 2: hash SHA256
-        hash_digest = hashlib.sha256(postdata_encoded).digest()
-        # Paso 3: concatenar path y hash
-        message = url_path.encode() + hash_digest
-        # Paso 4: HMAC SHA512 con el API secret
-        secret_decoded = base64.b64decode(api_secret)
-        hmac_digest = hmac.new(secret_decoded, message, hashlib.sha512).digest()
-        # Paso 5: codificar en base64
-        api_sign = base64.b64encode(hmac_digest)
-        return api_sign.decode()
 
     def add_order(self, ordertype, order_type, volume, symbol, price, api_key, api_secret):
         """
@@ -74,7 +49,9 @@ class KrakenSpotApiAddOrder:
 
         # Calcula el API-Sign usando el método helper
         url_path = "/0/private/AddOrder"
-        api_sign = self._generate_api_sign(url_path, postdata, api_secret)
+
+        generate_api_sign = GenerateApiSign()  # Instanciar la clase GenerateApiSign
+        api_sign = generate_api_sign.generate_api_sign(url_path, postdata, api_secret)
 
         # Prepara el payload y las cabeceras
         payload = json.dumps(postdata)

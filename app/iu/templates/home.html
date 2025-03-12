@@ -41,15 +41,25 @@
               <script src="/static/js/classes.js"></script>
             </div>
           </div>
-          
-          <div class="text-right">
-            <p class="text-lg spot-balance">
-              <strong>Spot Balances:</strong><br>
-              USDT: $<span id="usdt-balance">{{ balances.usdt if balances else 'Loading...' }}</span><br>
-              USD: $<span id="usd-balance">{{ balances.usd if balances else 'Loading...' }}</span><br>
-              BTC: <span id="btc-balance">{{ balances.btc if balances else 'Loading...' }}</span>
-            </p>
-            <p class="text-lg futures-balance hidden"><strong>Futures Balance (USDT/USD/BTC):</strong> <span id="kraken-futures-balance">Loading...</span></p>
+
+          <div class="account-balance-container bg-gray-100 p-4 rounded shadow-lg">
+            <select id="get-balance" class="w-full p-2 border rounded" >
+              <option value="">usd 
+                  <h2 class="text-xl font-bold mb-4">Balance de Cuenta</h2>
+              </option>
+              <option value="eur">
+                <div class="balance-item">
+                  <span class="asset">EUR:</span>
+                  <span class="amount">504,861.89</span>
+                </div>
+              </option>
+              <option value="eur">
+                <div class="balance-item">
+                  <span class="asset">EUR:</span>
+                  <span class="amount">504,861.89</span>
+                </div>
+              </option>
+            </select>
           </div>
         </div>
   

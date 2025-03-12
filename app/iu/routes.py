@@ -10,12 +10,10 @@ import time # Importar time desde la biblioteca estándar de Python
 import smtplib  # For sending emails
 import telegram
 from werkzeug.security import generate_password_hash
-from app.viewmodels.api.market_data import cancel_order, get_account_balance, execute_kraken_trade, fetch_historical_data
-from app.viewmodels.services.trading_logic import evaluate_strategy_performance, start_market_monitor, stop_market_monitor
-from sqlalchemy.exc import SQLAlchemyError
 from app.viewmodels.api.spot.KrakenSpotAPITicker import KrakenSpotAPI
 from app.viewmodels.api.futures.KrakenFuturesAPI import KrakenFuturesAPI
 from app.viewmodels.api.spot.KrakenSpotApiAddOrder import KrakenSpotApiAddOrder
+from app.viewmodels.api.spot.KrakenSpotApiGetAccountBalance import KrakenSpotApiGetAccountBalance
 import logging
 import requests
 import pandas as pd
@@ -99,33 +97,14 @@ def home():
             )
             db.session.add(user)
             db.session.commit()
-            logger.info("Created test user successfully")
+            # logger.info("Created test user successfully")
         
         # Get user's investments total
         total_invested = db.session.query(db.func.sum(Investment.amount)).filter_by(user_id=user.id).scalar() or 0
         total_generated = db.session.query(db.func.sum(Investment.total_generated)).filter_by(user_id=user.id).scalar() or 0
         
-        # Set default test balances
-        balances = {
-            'usdt': '1000.00',
-            'usd': '1000.00',
-            'btc': '0.05'
-        }
-        
-        # Try to get real balances from Kraken API
-        try:
-            kraken_balance = get_account_balance()
-            if not kraken_balance.get('error'):
-                balances = {
-                    'usdt': kraken_balance.get('USDT', '1000.00'),
-                    'usd': kraken_balance.get('ZUSD', '1000.00'),
-                    'btc': kraken_balance.get('XXBT', '0.05')
-                }
-        except Exception as e:
-            logger.warning(f"Could not get Kraken balances, using test values: {e}")
-        
-        logger.info(f"Got user balances successfully: {balances}")
-        return render_template("home.html", user=user, balances=balances, current_language=current_language,get_translated_text=get_translated_text)
+      
+        return render_template("home.html", user=user, current_language=current_language,get_translated_text=get_translated_text)
     except Exception as e:
         logger.error(f"Error in home route: {e}")
         return render_template("home.html", error=str(e),get_translated_text=get_translated_text)
@@ -286,7 +265,7 @@ def send_withdrawal_email(user, amount, currency, wallet_address):
             server.login(smtp_username, smtp_password)
             server.send_message(msg)
             
-        logger.info(f"Withdrawal email sent for {user.email} - Amount: {amount} {currency}, Wallet: {wallet_address}")
+        # logger.info(f"Withdrawal email sent for {user.email} - Amount: {amount} {currency}, Wallet: {wallet_address}")
     except Exception as e:
         logger.error(f"Error sending withdrawal email: {e}")
 
@@ -405,7 +384,7 @@ def profile_route():
             )
             db.session.add(user)
             db.session.commit()
-            logger.info("Created test user successfully")
+            # logger.info("Created test user successfully")
 
         if request.method == "POST":
             try:
@@ -525,47 +504,43 @@ def change_language():
     except Exception as e:
         logger.error(f"Error changing language: {e}")
         return jsonify({"error": str(e)}), 500
-
-@routes_bp.route("/stop_ai_trading", methods=["POST"])
-def stop_ai_trading():
-    """Stop AI trading"""
-    try:
-        stop_market_monitor()
-        return jsonify({"status": "success", "message": "AI trading stopped"})
-    except Exception as e:
-        logger.error(f"Error stopping AI trading: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@routes_bp.route("/update_trading_mode", methods=["POST"])
-def update_trading_mode():
-    """Update trading mode"""
-    try:
-        data = request.get_json()
-        mode = data.get("mode")
-        if mode not in ["spot", "futures"]:
-            return jsonify({"status": "error", "message": "Invalid trading mode"}), 400
-        current_app.config["TRADING_MODE"] = mode
-        return jsonify({"status": "success", "mode": mode})
-    except Exception as e:
-        logger.error(f"Error updating trading mode: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@routes_bp.route("/get_balance")
-def get_balance():
+    
+@routes_bp.route("/get_account_balance", methods =["POST"])
+def get_account_balance():
     """Get account balance"""
     try:
-        trading_mode = current_app.config.get("TRADING_MODE", "spot")
-        if trading_mode == "futures":
-            futures_client = KrakenFuturesAPI()
-            accounts = futures_client.get_accounts()
-            if accounts.get("error"):
-                return jsonify({"error": accounts["error"]}), 400
-            return jsonify({"futures_balance": accounts.get("accounts", [{}])[0]})
-        else:
-            balance = get_account_balance()
-            if balance.get("error"):
-                return jsonify({"error": balance["error"]}), 400
-            return jsonify({"spot_balance": balance})
+        # Verificar si la solicitud tiene un cuerpo JSON válido
+        if not request.is_json:
+            return jsonify({"error": "Request must be JSON"}), 400
+        
+        # Obtener los datos del cuerpo de la solicitud
+        data = request.get_json()
+        trading_mode = data.get("trading_mode")
+
+        print(f"Estamos dentro de get_accouny_balance y la data es: {data}")
+
+        logger.info(f"Estamos dentro de routes.py en la funcion get_account_balance Trading mode: {trading_mode}")
+
+        # Verificar si el modo de trading es válido
+        if trading_mode not in ["spot", "futures"]:
+            return jsonify({"error": "Invalid trading mode. Use 'spot' or 'futures'"}), 400
+        
+        # Obtener el balance según el modo de trading
+        if trading_mode == "spot":
+            # Para trading spot. usar KrakenSpotApi
+            get_account_balance = KrakenSpotApiGetAccountBalance()
+            balance_data = get_account_balance.get_account_balance(API_KEY_KRAKEN, API_SECRET_KRAKEN)
+            # print(f"Estamos dentro de routes.py en la funcion get_account_balance respuests de la clase: {jsonify(balance_data)}")
+            # print(f"balance_data: {jsonify(balance_data)}")
+            # print(f"balance_data: {balance_data}")
+            # print(f"balance_data: {status}")
+           # Devolver el balance
+            return jsonify(balance_data)
+        
+        elif trading_mode == "futures":
+            # Para trading futures, usar KrakenFuturesAPI (si está implementado)
+            return jsonify({"error": "Futures trading not implemented yet"}), 501
+        
     except Exception as e:
         logger.error(f"Error getting balance: {e}")
         return jsonify({"error": str(e)}), 500
@@ -591,9 +566,9 @@ def get_cryptos():
         # trading_mode = current_app.config.get("TRADING_MODE", "spot")
         trading_mode = data.get("trading_mode")
 
-        logger.info(f"Estamos dentro de routes.py en la funcion get_cryptos Trading mode: {trading_mode}")
+        # logger.info(f"Estamos dentro de routes.py en la funcion get_cryptos Trading mode: {trading_mode}")
         if trading_mode == "futures":
-            logger.info(f"Estamos dentro de futures en routes.py")
+            # logger.info(f"Estamos dentro de futures en routes.py")
             futures_client = KrakenFuturesAPI()
             data, status = futures_client.get_ticker_kraken()
             if status != 200:
@@ -627,7 +602,7 @@ def add_order():
     try:
         data = request.get_json()
         trading_mode = data.get("trading_mode")
-        logger.info(f"Modo de trading recibido: {trading_mode}")
+        # logger.info(f"Modo de trading recibido: {trading_mode}")
 
         if trading_mode == "spot":
             # Extraer los parámetros de la orden desde el JSON
@@ -820,7 +795,7 @@ def request_teleclass_access():
         db.session.commit()
 
         # Send notification to admin (you can implement email notification here)
-        logger.info(f"New teleclass access request from {user.email}: {data['reason']}")
+        # logger.info(f"New teleclass access request from {user.email}: {data['reason']}")
 
         return jsonify({
             "status": "success",
@@ -902,33 +877,7 @@ def update_current_symbol():
     except Exception as e:
         logger.error(f"Error updating current symbol: {e}")
         return jsonify({"error": str(e)}), 500
-
-
-@routes_bp.route("/analyze_and_execute_strategy", methods=["POST"])
-def analyze_and_execute_strategy():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"status": "error", "message": "No data provided"}), 400
-
-        symbol = data.get('symbol', 'XBTUSDT')
-        historical_data = fetch_historical_data(symbol)
-        if historical_data is None or historical_data.empty:
-            return jsonify({"status": "error", "message": "Could not fetch historical data"}), 400
-
-        performance, action, strategy_name, strategy_desc = evaluate_strategy_performance(
-            "Dynamic Strategy", historical_data, symbol, data.get('use_custom_strategies', False))
-
-        return jsonify({
-            "status": "success",
-            "performance": performance,
-            "action": action,
-            "strategy": strategy_name,
-            "description": strategy_desc
-        })
-    except Exception as e:
-        logger.error(f"Error in analyze_and_execute_strategy: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+    
 
 @routes_bp.route("/fetch_historical_data")
 def fetch_historical_data():
@@ -974,7 +923,7 @@ def predict():
         if isinstance(data, str):
             data = float(data)
 
-        print(f"Estamos en la funcion predict y el valor que recibe es : {data}")
+        # print(f"Estamos en la funcion predict y el valor que recibe es : {data}")
     # features = data['close']
 
     # print(f"Estamos en la funcion predict y el valor que recibe en features 1: {features}")
@@ -982,21 +931,21 @@ def predict():
 
     # Convertir las características en un array de numpy
         features = np.array([[float(data)]])
-        print(f"Estamos en la funcion predict y el valor que recibe en features 2: {features}")
+        # print(f"Estamos en la funcion predict y el valor que recibe en features 2: {features}")
    
 
-        print(f"Features con forma correcta: {features.shape}")
+        # print(f"Features con forma correcta: {features.shape}")
    
    
     # Hacer la predicción
         prediction = modelo.predict(features)
-        print(f"Estamos en la funcion predict y el valor que recibe en prediction: {prediction}")
+        # print(f"Estamos en la funcion predict y el valor que recibe en prediction: {prediction}")
         # Devolver la predicción en formato JSON
-        print(f"Predicción: {prediction}")
+        # print(f"Predicción: {prediction}")
         return jsonify({'prediction': prediction.tolist()})
     except ValueError as e:
-        print(f"Error al convertir los datos: {e}")
+        # print(f"Error al convertir los datos: {e}")
         return jsonify({'error': 'Error al convertir los datos', 'details': str(e)}), 400
     except Exception as e:
-        print(f"Error al realizar la predicción: {e}")
+        # print(f"Error al realizar la predicción: {e}")
         return jsonify({'error': 'Error al realizar la predicción', 'details': str(e)}), 500
