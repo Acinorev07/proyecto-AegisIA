@@ -31,11 +31,11 @@ class KrakenSpotApiGetAccountBalance:
 
     
         # Depurar la solicitud
-        logger.info(f"API Key: {api_key}")
-        logger.info(f"API secret: {api_secret}")
-        logger.info(f"API Sign: {api_sign}")
-        logger.info(f"endpoint_url: {self.__endpoint}")
-        logger.info(f"Payload: {payload}")
+        # logger.info(f"API Key: {api_key}")
+        # logger.info(f"API secret: {api_secret}")
+        # logger.info(f"API Sign: {api_sign}")
+        # logger.info(f"endpoint_url: {self.__endpoint}")
+        # logger.info(f"Payload: {payload}")
 
 
 
@@ -50,8 +50,8 @@ class KrakenSpotApiGetAccountBalance:
                 logger.error(f"Error en la petición: HTTP {response.status_code}")
                 return jsonify({"error": "Error en la petición"}), 500
             
-            logger.info(f"response: {response}")
-            logger.info(f"response: {response.json()}")
+            # logger.info(f"response: {response}")
+            # logger.info(f"response: {response.json()}")
 
             # Procesar la respuesta
             self.data = response.json()

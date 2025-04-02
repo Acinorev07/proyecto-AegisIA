@@ -10,7 +10,7 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
-    </head>
+  </head>
   <body>
     
     {% include 'partials/_header.html' %}
@@ -25,103 +25,103 @@
 
       <div class="main-content">
 
-        <div class="flex justify-between items-start p-4">
-          <div class="flex space-x-4">
-  
-            <div class="relative">
-              <button id="investment-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Inversion
-              </button>
-            </div>
-  
-            <div class="relative">
-              <button id="generate-referral-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Generar Link de Referido
-              </button>
-              <script src="/static/js/classes.js"></script>
-            </div>
-          </div>
+            <div class="flex justify-between items-start p-4">
+              <div class="flex space-x-4">
+      
+                <div class="relative">
+                  <button id="investment-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Inversion
+                  </button>
+                </div>
+      
+                <div class="relative">
+                  <button id="generate-referral-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Generar Link de Referido
+                  </button>
+                  <script src="/static/js/classes.js"></script>
+                </div>
+              </div>
 
-          <div class="account-balance-container bg-gray-100 p-4 rounded shadow-lg">
-            <select id="get-balance" class="w-full p-2 border rounded" >
-              <option value="">usd 
-                  <h2 class="text-xl font-bold mb-4">Balance de Cuenta</h2>
-              </option>
-              <option value="eur">
-                <div class="balance-item">
-                  <span class="asset">EUR:</span>
-                  <span class="amount">504,861.89</span>
+              <div class="account-balance-container bg-gray-100 p-4 rounded shadow-lg">
+                <select id="get-balance" class="w-full p-2 border rounded" >
+                  <option value="usd"> 
+                      <h2 class="text-xl font-bold mb-4">Balance de Cuenta</h2>
+                  </option>
+                  <option value="eur">
+                    <div class="balance-item">
+                      <span class="asset">EUR:</span>
+                      <span class="amount">504,861.89</span>
+                    </div>
+                  </option>
+                  <option value="eur">
+                    <div class="balance-item">
+                      <span class="asset">EUR:</span>
+                      <span class="amount">504,861.89</span>
+                    </div>
+                  </option>
+                </select>
+              </div>
+            </div>
+      
+            <div class="hero-section text-center py-4">
+              <h1 class="text-4xl font-bold mb-2">Welcome to Aegis-IA</h1>
+              <p class="text-lg mb-2">Leverage the power of AI for smarter trading decisions.</p>
+            </div>
+            <div class="crypto-section bg-gray-100 p-4 rounded mb-8">
+              <h2 class="text-2xl font-bold mb-4">Cryptocurrencies</h2>
+              <div class="flex items-center mb-4">
+                <input type="submit" id="fetchCryptos" value="Buscar cryptos" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
+                <div class="relative flex-grow">
+                  <input type="text" id="crypto-search" class="w-full pl-10 pr-2 py-2 border rounded" placeholder="Search cryptos...">
                 </div>
-              </option>
-              <option value="eur">
-                <div class="balance-item">
-                  <span class="asset">EUR:</span>
-                  <span class="amount">504,861.89</span>
+              </div>
+              <ul id="crypto-list" class="list-none"></ul>
+            
+            </div>
+            <div id="tradingview_chart" class="w-full h-96 mb-4"></div>
+            
+            <!-- Aqui va la tabla con los datos historicos del activo escogido -->
+          <!-- En tu home.html, dentro del div con id="historic-data" -->
+          <div id="historic-data">
+            <article>
+              <h2 id="historic-data-h2" class="text-2xl font-bold mb-4">Historial de Mercado</h2>
+              <div class="table-container"> <!-- Contenedor con scroll interno -->
+                
+                <!-- Títulos de la tabla -->
+                <div class="table-header">
+                  <table class="thead">
+                    <thead class="bg-gray-100">
+                      <tr>
+                        <th class="py-3 px-4 border-b text-left">Fecha-Hora</th>
+                        <th class="py-3 px-4 border-b text-left">Open</th>
+                        <th class="py-3 px-4 border-b text-left">High</th>
+                        <th class="py-3 px-4 border-b text-left">Low</th>
+                        <th class="py-3 px-4 border-b text-left">Close</th>
+                        <th class="py-3 px-4 border-b text-left">VWAP</th>
+                        <th class="py-3 px-4 border-b text-left">Volumen</th>
+                        <th class="py-3 px-4 border-b text-left">Count</th>
+                      </tr>
+                    </thead>
+                  </table>
                 </div>
-              </option>
-            </select>
-          </div>
+                
+                <!-- Contenido de la tabla con scroll -->
+                <div class="table-content">
+                  <table class="tbody">
+                    <tbody id="historic-table-body">
+                      <!-- Aquí se insertarán las filas dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+                
+              </div>
+            </article>
         </div>
-  
-        <div class="hero-section text-center py-4">
-          <h1 class="text-4xl font-bold mb-2">Welcome to Aegis-IA</h1>
-          <p class="text-lg mb-2">Leverage the power of AI for smarter trading decisions.</p>
-        </div>
-        <div class="crypto-section bg-gray-100 p-4 rounded mb-8">
-          <h2 class="text-2xl font-bold mb-4">Cryptocurrencies</h2>
-          <div class="flex items-center mb-4">
-            <input type="submit" id="fetchCryptos" value="Buscar cryptos" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-            <div class="relative flex-grow">
-              <input type="text" id="crypto-search" class="w-full pl-10 pr-2 py-2 border rounded" placeholder="Search cryptos...">
-            </div>
-          </div>
-          <ul id="crypto-list" class="list-none"></ul>
-         
-        </div>
-        <div id="tradingview_chart" class="w-full h-96 mb-4"></div>
-        
-        <!-- Aqui va la tabla con los datos historicos del activo escogido -->
-      <!-- En tu home.html, dentro del div con id="historic-data" -->
-      <div id="historic-data">
-        <article>
-          <h2 id="historic-data-h2" class="text-2xl font-bold mb-4">Historial de Mercado</h2>
-          <div class="table-container"> <!-- Contenedor con scroll interno -->
-            
-            <!-- Títulos de la tabla -->
-            <div class="table-header">
-              <table class="thead">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th class="py-3 px-4 border-b text-left">Fecha-Hora</th>
-                    <th class="py-3 px-4 border-b text-left">Open</th>
-                    <th class="py-3 px-4 border-b text-left">High</th>
-                    <th class="py-3 px-4 border-b text-left">Low</th>
-                    <th class="py-3 px-4 border-b text-left">Close</th>
-                    <th class="py-3 px-4 border-b text-left">VWAP</th>
-                    <th class="py-3 px-4 border-b text-left">Volumen</th>
-                    <th class="py-3 px-4 border-b text-left">Count</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-            
-            <!-- Contenido de la tabla con scroll -->
-            <div class="table-content">
-              <table class="tbody">
-                <tbody id="historic-table-body">
-                  <!-- Aquí se insertarán las filas dinámicamente -->
-                </tbody>
-              </table>
-            </div>
-            
-          </div>
-        </article>
       </div>
-  </div>
-</div>
+    </div>
           
       
-<div id="prediction-result"></div>
+    <div id="prediction-result"></div>
 
 
         <!-- Manual Trading Controls -->

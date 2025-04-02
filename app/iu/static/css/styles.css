@@ -79,6 +79,16 @@ body {
   font-weight: 500;
 }
 
+.content-body {
+
+  display: flex; /* Activa flexbox */
+  flex-direction: column; /* Coloca elementos en columna */
+  align-items: stretch; /* Centra elementos horizontalmente */
+  gap: 16px; /* Espaciado vertical entre elementos (equivalente a space-y-4) */
+  margin-bottom: 16px; /* Margen inferior (equivalente a mb-4) */
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+}
+
 .desktop-nav ul {
   display: flex;
   gap: 1rem;
@@ -226,12 +236,7 @@ body {
   background-color: #4a5568;
 }
 
-.main-content {
-  max-width: 1280px;
-  /* margin: 0.5rem auto 0; */
-  /* padding: 0 1rem; */
-  min-height: calc((100vh - 4rem) / 2);
-}
+
 
 /* Chat styles */
 #chat-messages {

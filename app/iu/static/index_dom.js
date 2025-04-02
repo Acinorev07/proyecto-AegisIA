@@ -6,6 +6,7 @@ import ReferralLink from "./js/ReferralLink.js";
 import method_trading from "./js/MethodTrading.js";
 
 import get_method from "./js/get_method.js";
+import get_symbol from "./js/get_symbol.js";
 import send_strategy from "./js/send_strategy.js";
 import get_historical_data from "./js/get_historical_data.js";
 import add_order from "./js/add_order.js";
@@ -20,6 +21,8 @@ d.addEventListener("DOMContentLoaded", async (e)=>{
     const link_ref = new ReferralLink();
     
     let method = ls.getItem('method');
+
+    
     // Si el localStorage esta vacio, obtiene el método por defecto desde el backend y lo almacena
     if(!method){
         method = await get_method();
@@ -31,6 +34,24 @@ d.addEventListener("DOMContentLoaded", async (e)=>{
          ls.setItem('method',method)
         }
     }
+
+    //Si el localstorage esta vacio, obtiene el simbolo por defecto desde el backend y lo almacena
+    let symbol = ls.getItem('symbol');
+
+    if(!symbol){
+        symbol = await get_symbol();
+        if(symbol){
+            console.log("Estamos dentro de la funcion index_dom, y el simbolo es 1: ",symbol)
+            ls.setItem('symbol',symbol);
+        }else{
+
+            //Si no se puede obtener el simbolo por algun error, usar "XBTUSD"
+            symbol = 'XBTUSD';
+            ls.setItem('symbol',symbol);
+        }
+    }
+    console.log("Estamos dentro de la funcion index_dom, y el simbolo es 1: ",symbol)
+
     //Clase que permite cargar el widget de trading view en el cuerpo del documento
     tvWidget.loadTradingSymbol().then(() => {
         // console.log(`El símbolo actual es: ${tvWidget.getCurrentTradingSymbol()}`); 
@@ -53,7 +74,8 @@ d.addEventListener("DOMContentLoaded", async (e)=>{
 
     send_strategy(null,'send-strategy','chat-input','strategy-mode-button','chat-messages');
 
-    let symbol = ls.getItem('symbol');
+    // let symbol = ls.getItem('symbol');
+
     get_historical_data(symbol);
 
     add_order('add-order','order-type','type','amount',symbol)

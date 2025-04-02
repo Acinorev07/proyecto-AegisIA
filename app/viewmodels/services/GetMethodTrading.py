@@ -13,4 +13,4 @@ class GetMethodTrading:
         # Obtener el modo de trading desde la configuracion. con "spot" como valor predeterminado
         self.method = current_app.config.get("TRADING_MODE", "spot")
 
-        return self.method
+        return self.method()

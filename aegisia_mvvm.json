@@ -1,6 +1,6 @@
 {
     "Proyecto aegisIA": {
-      "Version":"0.0.1",
+      "Version":"0.0.2",
       "Estructura de Directorios":{
         "app":{
             "iu":{
@@ -15,13 +15,24 @@
                     },
                     "js":{
                         "raiz":[
+                            "add_order.js",
                             "ai_trading.js",
-                            "chart.js",
                             "classes.js",
                             "finances.js",
+                            "get_account_balance.js",
+                            "get_cryptos.js",
+                            "get_historical_data.js",
+                            "get_method.js",
+                            "header_dom.js",
                             "header.js",
+                            "InversionTron.js",
+                            "MethodTrading.js",
                             "password.js",
+                            "predict.js",
                             "profile.js",
+                            "ReferralLink.js",
+                            "send_strategy.js",
+                            "TvWidget.js",
                             "wallet.js"
                         ]
                     },
@@ -30,12 +41,13 @@
                             ".gitkeep"
                         ]
                     },
-                    "raiz":[null]
+                    "raiz":[
+                      "index_dom.js"
+                    ]
                 },
                 "templates":{
                     "partials":{
                         "raiz":[
-                            "_desktop_header.html",
                             "_header.html",
                             "_mobile_header.html"
                         ]
@@ -67,15 +79,26 @@
             },
             "viewmodels":{
                 "api":{
-                    "raiz":[
-                        "kraken_api.py",
-                        "market_data.py"
-                    ]
+
+                    "futures":{
+                      "raiz":[
+                        "KrakenFuturesAPI.py"
+                      ]
+                    },
+                    "spot":{
+                      "raiz":[
+                        "KrakenSpotApiAddOrder.py",
+                        "KrakenSpotApiGetAccountBalance.py",
+                        "KrakenSpotAPITiker.py"
+                      ]
+                    }
+                    ,
+                    "raiz":[]
                 },
                 "services":{
                     "raiz":[
-                        "analyze_and_execute_strategy.py",
-                        "trading_logic.py"
+                        "GenerateApiSign.py",
+                        "GetMethodTrading.py"
                     ]
                 },
                 "raiz":[null]
@@ -112,7 +135,12 @@
             "Dockerfile",
             "main.py",
             "requirements.txt",
-            "translations.json"
+            "translations.json",
+            "utils.txt",
+            "Aegis-IA0003.h5",
+            ".env",
+            ".gitignore"
+
         ]
 
       },
@@ -182,6 +210,7 @@
         "routes.py": {
           "declara": {
             "funciones": [
+                "mse",
                 "load_translations",
                 "get_translated_text",
                 "home",
@@ -197,18 +226,23 @@
                 "classes_route",
                 "settings_2fa_route",
                 "change_language",
-                "stop_ai_trading",
-                "update_trading_mode",
-                "get_balance",
+                "get_account_balance",
+                "get_method_trading",               
                 "get_cryptos",
+                "add_order",
                 "upload_class",
                 "generate_access_link",
                 "generate_referral_link",
                 "request_teleclass_access",
                 "settings_wallet_route",
-                "get_current_symbol"
+                "get_current_symbol",
+                "update_current_symbol",
+                "fetch_historical_data",
+                "predict"
             ],
-            "clases": [null],
+            "clases": [
+              null
+            ],
             "Blueprints":[
                 "route_bp"
             ],
@@ -228,35 +262,40 @@
                         "classes",
                         "settings/2fa",
                         "change_language",
-                        "stop_ai_trading",
-                        "update_trading_mode",
-                        "get_balance",
+                        "get_account_balance",
+                        "get_method_trading",
                         "get_cryptos",
+                        "add_order",
                         "upload_class",
                         "generate_access_link",
                         "generate_referral_link",
                         "request_teleclass_access",
                         "settings/wallet",
-                        "get_current_symbol"
-
+                        "get_current_symbol",
+                        "update_current_symbol",
+                        "fetch_historical_data",
+                        "predict"
                         ]
                     }
             ],
             "instancias":[
                 {"nombre":"bot","tipo":"objeto","origen":"telegram.Bot"},
-                {"nombre":"logger","tipo":"objeto","origen":"logging.getLogger"}
+                {"nombre":"logger","tipo":"objeto","origen":"logging.getLogger"},
+                {"nombre":"method_instance","tipo":"objeto","origen":"GetMethodTrading"},
+                {"nombre":"modelo","tipo":"objeto","origen":"tf.keras.models.load_model"}
             ]
           },
           "utiliza": {
             "backend":[
               {"ejecutable":["User","ReferralLink","Withdrawal","Investment","Strategy"],"origen":"shared_model.py","tipo":"clase"},
-              {"ejecutable":["KrakenFuturesAPI"],"origen":"kraken_api.py","tipo":"clase"},
-              {"ejecutable":["cancel_order","get_account_balance","execute_kraken_trade","fetch_historical_data"],"origen":"market_data.py","tipo":"funcion"},
-              {"ejecutable":["evaluate_strategy_performance","start_market_monitor","stop_market_monitor"],"origen":"trading_logic.py","tipo":"funcion"},
+              {"ejecutable":["KrakenFuturesAPI"],"origen":"KrakenFuturesAPI.py","tipo":"clase"},
+              {"ejecutable":["KrakenSpotAPITicker"],"origen":"KrakenSpotAPI","tipo":"clase"},
+              {"ejecutable":["KrakenSpotApiAddOrder"],"origen":"KrakenSpotApiAddOrder.py","tipo":"clase"},
+              {"ejecutable":["KrakenSpotApiGetAccountBalance"],"origen":"KrakenSpotApiGetAccountBalance.py","tipo":"clase"},
               {"ejecutable":["db"],"origen":"Aplicacion","tipo":"instancia de clase"}       
             ],
             "frontend":[
-              {"template":["home.html"],"rutas":["home"],"scripts":"charts.js"},
+              {"template":["home.html"],"rutas":["home"],"scripts":"index_dom.js"},
               {"template":["finances.html"],"rutas":["finances","confirm_withdrawal"],"scripts":"finances.js"},
               {"template":["confirm_withdrawal.html"],"rutas":["confirm_withdrawal"],"scripts":""},
               {"template":["password.html"],"rutas":["settings/password"],"scripts":"password.js"},
@@ -290,7 +329,7 @@
             "frontend":[null]
           }
         },
-        "kraken_api.py": {
+        ".py": {
             "declara": {
               "funciones": ["execute_trade"],
               "clases": {
@@ -320,7 +359,7 @@
               "frontend":[null]
             }
         },
-        "market_data.py": {
+        ".py": {
             "declara": {
               "funciones": [
                   "fetch_historical_data",
@@ -341,7 +380,7 @@
               "frontend":[null]
             }
           },
-        "trading_logic.py": {
+        ".py": {
             "declara": {
               "funciones": [
                   "initialize", 
@@ -371,7 +410,7 @@
               "frontend":[null]
             }
         },
-        "analyze_and_execute_strategy.py":{
+        ".py":{
           "declara":{
             "funciones":[
               "analyze_and_execute_strategy",
